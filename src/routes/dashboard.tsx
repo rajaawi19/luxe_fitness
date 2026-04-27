@@ -20,6 +20,8 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 type Membership = Awaited<ReturnType<typeof getMembershipStatus>>;
+type InvoicesResult = Awaited<ReturnType<typeof listInvoices>>;
+type Invoice = InvoicesResult["invoices"][number];
 
 function DashboardPage() {
   const navigate = useNavigate();
