@@ -329,20 +329,58 @@ function DashboardPage() {
           ) : invoices.length === 0 ? (
             <p className="text-muted-foreground">No invoices yet. Once you subscribe, your receipts will appear here.</p>
           ) : (
-            <div className="overflow-x-auto -mx-2">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                    <th className="text-left font-normal py-3 px-2">Date</th>
-                    <th className="text-left font-normal py-3 px-2">Invoice</th>
-                    <th className="text-left font-normal py-3 px-2">Amount</th>
-                    <th className="text-left font-normal py-3 px-2">Status</th>
-                    <th className="text-right font-normal py-3 px-2">Receipt</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {invoices.map((inv) => (
-                    <tr key={inv.id} className="border-t border-border/40">
+            <>
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                <div className="relative flex-1 min-w-[220px]">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input
+                    type="search"
+                    value={invoiceSearch}
+                    onChange={(e) => setInvoiceSearch(e.target.value)}
+                    placeholder="Search by invoice # or amount…"
+                    className="w-full pl-9 pr-3 py-2 rounded-full glass gold-border bg-transparent text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:ring-1 focus:ring-primary/60"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {(["all", "paid", "open", "void", "uncollectible", "draft"] as const).map((s) => {
+                    const count = statusCounts[s] ?? 0;
+                    if (s !== "all" && count === 0) return null;
+                    const active = invoiceStatus === s;
+                    return (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setInvoiceStatus(s)}
+                        className={`px-3 py-1.5 rounded-full text-[10px] uppercase tracking-[0.2em] transition ${
+                          active
+                            ? "bg-gradient-gold text-primary-foreground shadow-gold"
+                            : "glass gold-border text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {s} <span className="ml-1 opacity-70">{count}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {filteredInvoices.length === 0 ? (
+                <p className="text-muted-foreground">No invoices match your filters.</p>
+              ) : (
+                <div className="overflow-x-auto -mx-2">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                        <th className="text-left font-normal py-3 px-2">Date</th>
+                        <th className="text-left font-normal py-3 px-2">Invoice</th>
+                        <th className="text-left font-normal py-3 px-2">Amount</th>
+                        <th className="text-left font-normal py-3 px-2">Status</th>
+                        <th className="text-right font-normal py-3 px-2">Receipt</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredInvoices.map((inv) => (
+                        <tr key={inv.id} className="border-t border-border/40">
                       <td className="py-4 px-2 whitespace-nowrap">
                         {new Date(inv.created).toLocaleDateString()}
                       </td>
