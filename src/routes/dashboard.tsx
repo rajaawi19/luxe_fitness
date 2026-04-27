@@ -1,9 +1,15 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { toast } from "sonner";
-import { Activity, Calendar, Flame, LogOut, Trophy } from "lucide-react";
+import { Activity, Calendar, Crown, Flame, Loader2, LogOut, Settings, Trophy, XCircle } from "lucide-react";
+import {
+  cancelSubscription,
+  createPortalSession,
+  getMembershipStatus,
+  resumeSubscription,
+} from "@/server/stripe";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -12,10 +18,32 @@ export const Route = createFileRoute("/dashboard")({
   component: DashboardPage,
 });
 
+type Membership = Awaited<ReturnType<typeof getMembershipStatus>>;
+
 function DashboardPage() {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [membership, setMembership] = useState<Membership | null>(null);
+  const [membershipLoading, setMembershipLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<"portal" | "cancel" | "resume" | null>(null);
+
+  const loadMembership = useCallback(async () => {
+    setMembershipLoading(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      if (!sess.session) return;
+      const result = await getMembershipStatus({
+        headers: { Authorization: `Bearer ${sess.session.access_token}` },
+      } as any);
+      setMembership(result);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to load membership";
+      toast.error(msg);
+    } finally {
+      setMembershipLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
@@ -26,14 +54,76 @@ function DashboardPage() {
       setUser(data.session?.user ?? null);
       setLoading(false);
       if (!data.session) navigate({ to: "/auth" });
+      else loadMembership();
     });
     return () => sub.subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, loadMembership]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
     toast.success("Signed out");
     navigate({ to: "/" });
+  };
+
+  const withAuth = async <T,>(fn: (auth: string) => Promise<T>): Promise<T | null> => {
+    const { data: sess } = await supabase.auth.getSession();
+    if (!sess.session) return null;
+    return fn(`Bearer ${sess.session.access_token}`);
+  };
+
+  const openPortal = async () => {
+    setActionLoading("portal");
+    try {
+      const result = await withAuth((auth) =>
+        createPortalSession({
+          data: { origin: window.location.origin },
+          headers: { Authorization: auth },
+        } as any),
+      );
+      if (result?.url) window.location.href = result.url;
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not open billing portal");
+      setActionLoading(null);
+    }
+  };
+
+  const cancel = async () => {
+    if (!membership || !("subscriptionId" in membership) || !membership.subscriptionId) return;
+    if (!confirm("Cancel your membership at the end of the current period?")) return;
+    setActionLoading("cancel");
+    try {
+      await withAuth((auth) =>
+        cancelSubscription({
+          data: { subscriptionId: membership.subscriptionId! },
+          headers: { Authorization: auth },
+        } as any),
+      );
+      toast.success("Membership will end at the period close");
+      await loadMembership();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Cancel failed");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const resume = async () => {
+    if (!membership || !("subscriptionId" in membership) || !membership.subscriptionId) return;
+    setActionLoading("resume");
+    try {
+      await withAuth((auth) =>
+        resumeSubscription({
+          data: { subscriptionId: membership.subscriptionId! },
+          headers: { Authorization: auth },
+        } as any),
+      );
+      toast.success("Membership resumed");
+      await loadMembership();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Resume failed");
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   if (loading) {
@@ -60,6 +150,111 @@ function DashboardPage() {
           >
             <LogOut className="h-4 w-4" /> Sign out
           </button>
+        </div>
+
+        {/* Membership card */}
+        <div className="p-10 rounded-3xl glass gold-border mb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <Crown className="h-5 w-5 text-primary" />
+            <h2 className="font-display text-3xl">Your Membership</h2>
+          </div>
+
+          {membershipLoading ? (
+            <div className="flex items-center gap-3 text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" /> Loading membership…
+            </div>
+          ) : !membership || !membership.active && !("subscriptionId" in membership && membership.subscriptionId) ? (
+            <div>
+              <p className="text-muted-foreground mb-6">You don't have an active membership yet.</p>
+              <Link
+                to="/membership"
+                className="px-8 py-3 rounded-full bg-gradient-gold text-primary-foreground text-xs font-semibold uppercase tracking-[0.25em] shadow-gold inline-block"
+              >
+                Choose a Plan
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                <Stat label="Tier" value={membership.plan ?? "—"} accent />
+                <Stat
+                  label="Status"
+                  value={
+                    membership.cancelAtPeriodEnd
+                      ? "Canceling"
+                      : (membership.status ?? "—")
+                  }
+                />
+                <Stat
+                  label={membership.cancelAtPeriodEnd ? "Ends" : "Renews"}
+                  value={
+                    membership.currentPeriodEnd
+                      ? new Date(membership.currentPeriodEnd).toLocaleDateString()
+                      : "—"
+                  }
+                />
+                <Stat label="Auto-renew" value={membership.cancelAtPeriodEnd ? "Off" : "On"} />
+              </div>
+
+              {membership.cancelAtPeriodEnd && (
+                <div className="mb-6 p-4 rounded-xl bg-destructive/10 border border-destructive/30 text-sm">
+                  Your membership is set to cancel on{" "}
+                  <strong>
+                    {membership.currentPeriodEnd
+                      ? new Date(membership.currentPeriodEnd).toLocaleDateString()
+                      : "the period end"}
+                  </strong>
+                  . You'll keep access until then.
+                </div>
+              )}
+
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={openPortal}
+                  disabled={actionLoading !== null}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-gold text-primary-foreground text-xs font-semibold uppercase tracking-[0.25em] shadow-gold disabled:opacity-60"
+                >
+                  {actionLoading === "portal" ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Settings className="h-3 w-3" />
+                  )}
+                  Manage Billing
+                </button>
+
+                {membership.cancelAtPeriodEnd ? (
+                  <button
+                    onClick={resume}
+                    disabled={actionLoading !== null}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full glass gold-border text-xs font-semibold uppercase tracking-[0.25em] hover:bg-accent/40 disabled:opacity-60"
+                  >
+                    {actionLoading === "resume" && <Loader2 className="h-3 w-3 animate-spin" />}
+                    Resume Membership
+                  </button>
+                ) : (
+                  <button
+                    onClick={cancel}
+                    disabled={actionLoading !== null || !membership.active}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full glass border border-destructive/40 text-xs font-semibold uppercase tracking-[0.25em] text-destructive hover:bg-destructive/10 disabled:opacity-60"
+                  >
+                    {actionLoading === "cancel" ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <XCircle className="h-3 w-3" />
+                    )}
+                    Cancel Membership
+                  </button>
+                )}
+
+                <Link
+                  to="/membership"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full glass text-xs font-semibold uppercase tracking-[0.25em] hover:bg-accent/40"
+                >
+                  Change Plan
+                </Link>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 mb-12">
@@ -90,6 +285,19 @@ function DashboardPage() {
             Confirm Booking
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function Stat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+  return (
+    <div>
+      <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-2">{label}</div>
+      <div
+        className={`font-display capitalize ${accent ? "text-3xl text-gradient-gold" : "text-2xl"}`}
+      >
+        {value}
       </div>
     </div>
   );

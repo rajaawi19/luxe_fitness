@@ -64,6 +64,103 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     return { url: session.url };
   });
 
+export const getMembershipStatus = createServerFn({ method: "POST" })
+  .handler(async () => {
+    const stripe = getStripe();
+    const user = await getUserFromRequest();
+    if (!user) throw new Error("You must be signed in");
+    if (!user.email) return { active: false as const };
+
+    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    const customer = customers.data[0];
+    if (!customer) return { active: false as const };
+
+    const subs = await stripe.subscriptions.list({
+      customer: customer.id,
+      status: "all",
+      limit: 5,
+    });
+
+    const sub =
+      subs.data.find((s) => ["active", "trialing", "past_due"].includes(s.status)) ??
+      subs.data.find((s) => s.cancel_at_period_end) ??
+      subs.data[0];
+
+    if (!sub) return { active: false as const, customerId: customer.id };
+
+    return {
+      active: ["active", "trialing"].includes(sub.status),
+      customerId: customer.id,
+      subscriptionId: sub.id,
+      status: sub.status,
+      plan: (sub.metadata?.plan as PlanName) ?? null,
+      cancelAtPeriodEnd: sub.cancel_at_period_end,
+      currentPeriodEnd: (sub as any).current_period_end
+        ? new Date((sub as any).current_period_end * 1000).toISOString()
+        : null,
+    };
+  });
+
+export const createPortalSession = createServerFn({ method: "POST" })
+  .inputValidator((input: { origin: string }) => input)
+  .handler(async ({ data }) => {
+    const stripe = getStripe();
+    const user = await getUserFromRequest();
+    if (!user?.email) throw new Error("You must be signed in");
+
+    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    const customer = customers.data[0];
+    if (!customer) throw new Error("No billing account found. Subscribe to a plan first.");
+
+    const portal = await stripe.billingPortal.sessions.create({
+      customer: customer.id,
+      return_url: `${data.origin}/dashboard`,
+    });
+    return { url: portal.url };
+  });
+
+export const cancelSubscription = createServerFn({ method: "POST" })
+  .inputValidator((input: { subscriptionId: string }) => input)
+  .handler(async ({ data }) => {
+    const stripe = getStripe();
+    const user = await getUserFromRequest();
+    if (!user) throw new Error("You must be signed in");
+
+    const sub = await stripe.subscriptions.retrieve(data.subscriptionId);
+    if (sub.metadata?.user_id && sub.metadata.user_id !== user.id) {
+      throw new Error("Not authorized for this subscription");
+    }
+
+    const updated = await stripe.subscriptions.update(data.subscriptionId, {
+      cancel_at_period_end: true,
+    });
+    return {
+      status: updated.status,
+      cancelAtPeriodEnd: updated.cancel_at_period_end,
+      currentPeriodEnd: (updated as any).current_period_end
+        ? new Date((updated as any).current_period_end * 1000).toISOString()
+        : null,
+    };
+  });
+
+export const resumeSubscription = createServerFn({ method: "POST" })
+  .inputValidator((input: { subscriptionId: string }) => input)
+  .handler(async ({ data }) => {
+    const stripe = getStripe();
+    const user = await getUserFromRequest();
+    if (!user) throw new Error("You must be signed in");
+
+    const sub = await stripe.subscriptions.retrieve(data.subscriptionId);
+    if (sub.metadata?.user_id && sub.metadata.user_id !== user.id) {
+      throw new Error("Not authorized for this subscription");
+    }
+
+    const updated = await stripe.subscriptions.update(data.subscriptionId, {
+      cancel_at_period_end: false,
+    });
+    return { status: updated.status, cancelAtPeriodEnd: updated.cancel_at_period_end };
+  });
+
 export const verifyCheckoutSession = createServerFn({ method: "POST" })
   .inputValidator((input: { sessionId: string }) => input)
   .handler(async ({ data }) => {
