@@ -30,6 +30,8 @@ function DashboardPage() {
   const [membership, setMembership] = useState<Membership | null>(null);
   const [membershipLoading, setMembershipLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<"portal" | "cancel" | "resume" | null>(null);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [invoicesLoading, setInvoicesLoading] = useState(true);
 
   const loadMembership = useCallback(async () => {
     setMembershipLoading(true);
@@ -48,7 +50,22 @@ function DashboardPage() {
     }
   }, []);
 
-  useEffect(() => {
+  const loadInvoices = useCallback(async () => {
+    setInvoicesLoading(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      if (!sess.session) return;
+      const result = await listInvoices({
+        headers: { Authorization: `Bearer ${sess.session.access_token}` },
+      } as any);
+      setInvoices(result.invoices);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to load invoices";
+      toast.error(msg);
+    } finally {
+      setInvoicesLoading(false);
+    }
+  }, []);
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       setUser(session?.user ?? null);
       if (!session) navigate({ to: "/auth" });
