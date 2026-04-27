@@ -3,11 +3,12 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { toast } from "sonner";
-import { Activity, Calendar, Crown, Flame, Loader2, LogOut, Settings, Trophy, XCircle } from "lucide-react";
+import { Activity, Calendar, Crown, Download, ExternalLink, FileText, Flame, Loader2, LogOut, Settings, Trophy, XCircle } from "lucide-react";
 import {
   cancelSubscription,
   createPortalSession,
   getMembershipStatus,
+  listInvoices,
   resumeSubscription,
 } from "@/server/stripe";
 
