@@ -32,6 +32,30 @@ function DashboardPage() {
   const [actionLoading, setActionLoading] = useState<"portal" | "cancel" | "resume" | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [invoicesLoading, setInvoicesLoading] = useState(true);
+  const [invoiceSearch, setInvoiceSearch] = useState("");
+  const [invoiceStatus, setInvoiceStatus] = useState<"all" | "paid" | "open" | "void" | "uncollectible" | "draft">("all");
+
+  const filteredInvoices = useMemo(() => {
+    const q = invoiceSearch.trim().toLowerCase();
+    return invoices.filter((inv) => {
+      if (invoiceStatus !== "all" && inv.status !== invoiceStatus) return false;
+      if (!q) return true;
+      const hay = [inv.number, inv.id, inv.status, String(inv.amountPaid ?? ""), String(inv.amountDue ?? "")]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return hay.includes(q);
+    });
+  }, [invoices, invoiceSearch, invoiceStatus]);
+
+  const statusCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: invoices.length };
+    for (const inv of invoices) {
+      const s = inv.status ?? "unknown";
+      counts[s] = (counts[s] ?? 0) + 1;
+    }
+    return counts;
+  }, [invoices]);
 
   const loadMembership = useCallback(async () => {
     setMembershipLoading(true);
