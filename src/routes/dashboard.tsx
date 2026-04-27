@@ -66,6 +66,8 @@ function DashboardPage() {
       setInvoicesLoading(false);
     }
   }, []);
+
+  useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       setUser(session?.user ?? null);
       if (!session) navigate({ to: "/auth" });
@@ -74,10 +76,13 @@ function DashboardPage() {
       setUser(data.session?.user ?? null);
       setLoading(false);
       if (!data.session) navigate({ to: "/auth" });
-      else loadMembership();
+      else {
+        loadMembership();
+        loadInvoices();
+      }
     });
     return () => sub.subscription.unsubscribe();
-  }, [navigate, loadMembership]);
+  }, [navigate, loadMembership, loadInvoices]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
