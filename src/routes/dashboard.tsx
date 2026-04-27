@@ -418,3 +418,16 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
     </div>
   );
 }
+
+function formatAmount(amount: number | null, currency: string | null) {
+  if (amount == null) return "—";
+  const cur = (currency ?? "usd").toUpperCase();
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: cur,
+    }).format(amount / 100);
+  } catch {
+    return `${(amount / 100).toFixed(2)} ${cur}`;
+  }
+}
