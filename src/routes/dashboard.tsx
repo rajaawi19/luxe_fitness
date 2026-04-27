@@ -1,9 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { toast } from "sonner";
-import { Activity, Calendar, Crown, Download, ExternalLink, FileText, Flame, Loader2, LogOut, Settings, Trophy, XCircle } from "lucide-react";
+import { Activity, Calendar, Crown, Download, ExternalLink, FileText, Flame, Loader2, LogOut, Search, Settings, Trophy, XCircle } from "lucide-react";
 import {
   cancelSubscription,
   createPortalSession,
@@ -32,6 +32,30 @@ function DashboardPage() {
   const [actionLoading, setActionLoading] = useState<"portal" | "cancel" | "resume" | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [invoicesLoading, setInvoicesLoading] = useState(true);
+  const [invoiceSearch, setInvoiceSearch] = useState("");
+  const [invoiceStatus, setInvoiceStatus] = useState<"all" | "paid" | "open" | "void" | "uncollectible" | "draft">("all");
+
+  const filteredInvoices = useMemo(() => {
+    const q = invoiceSearch.trim().toLowerCase();
+    return invoices.filter((inv) => {
+      if (invoiceStatus !== "all" && inv.status !== invoiceStatus) return false;
+      if (!q) return true;
+      const hay = [inv.number, inv.id, inv.status, String(inv.amountPaid ?? ""), String(inv.amountDue ?? "")]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return hay.includes(q);
+    });
+  }, [invoices, invoiceSearch, invoiceStatus]);
+
+  const statusCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: invoices.length };
+    for (const inv of invoices) {
+      const s = inv.status ?? "unknown";
+      counts[s] = (counts[s] ?? 0) + 1;
+    }
+    return counts;
+  }, [invoices]);
 
   const loadMembership = useCallback(async () => {
     setMembershipLoading(true);
@@ -305,20 +329,58 @@ function DashboardPage() {
           ) : invoices.length === 0 ? (
             <p className="text-muted-foreground">No invoices yet. Once you subscribe, your receipts will appear here.</p>
           ) : (
-            <div className="overflow-x-auto -mx-2">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                    <th className="text-left font-normal py-3 px-2">Date</th>
-                    <th className="text-left font-normal py-3 px-2">Invoice</th>
-                    <th className="text-left font-normal py-3 px-2">Amount</th>
-                    <th className="text-left font-normal py-3 px-2">Status</th>
-                    <th className="text-right font-normal py-3 px-2">Receipt</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {invoices.map((inv) => (
-                    <tr key={inv.id} className="border-t border-border/40">
+            <>
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                <div className="relative flex-1 min-w-[220px]">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input
+                    type="search"
+                    value={invoiceSearch}
+                    onChange={(e) => setInvoiceSearch(e.target.value)}
+                    placeholder="Search by invoice # or amount…"
+                    className="w-full pl-9 pr-3 py-2 rounded-full glass gold-border bg-transparent text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:ring-1 focus:ring-primary/60"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {(["all", "paid", "open", "void", "uncollectible", "draft"] as const).map((s) => {
+                    const count = statusCounts[s] ?? 0;
+                    if (s !== "all" && count === 0) return null;
+                    const active = invoiceStatus === s;
+                    return (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setInvoiceStatus(s)}
+                        className={`px-3 py-1.5 rounded-full text-[10px] uppercase tracking-[0.2em] transition ${
+                          active
+                            ? "bg-gradient-gold text-primary-foreground shadow-gold"
+                            : "glass gold-border text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {s} <span className="ml-1 opacity-70">{count}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {filteredInvoices.length === 0 ? (
+                <p className="text-muted-foreground">No invoices match your filters.</p>
+              ) : (
+                <div className="overflow-x-auto -mx-2">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                        <th className="text-left font-normal py-3 px-2">Date</th>
+                        <th className="text-left font-normal py-3 px-2">Invoice</th>
+                        <th className="text-left font-normal py-3 px-2">Amount</th>
+                        <th className="text-left font-normal py-3 px-2">Status</th>
+                        <th className="text-right font-normal py-3 px-2">Receipt</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredInvoices.map((inv) => (
+                        <tr key={inv.id} className="border-t border-border/40">
                       <td className="py-4 px-2 whitespace-nowrap">
                         {new Date(inv.created).toLocaleDateString()}
                       </td>
@@ -367,9 +429,11 @@ function DashboardPage() {
                       </td>
                     </tr>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
           )}
         </div>
 
