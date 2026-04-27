@@ -429,9 +429,11 @@ function DashboardPage() {
                       </td>
                     </tr>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
           )}
         </div>
 
