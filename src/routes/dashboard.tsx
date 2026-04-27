@@ -282,6 +282,97 @@ function DashboardPage() {
           )}
         </div>
 
+        {/* Invoices / Receipts */}
+        <div className="p-10 rounded-3xl glass gold-border mb-12">
+          <div className="flex items-center justify-between flex-wrap gap-3 mb-6">
+            <div className="flex items-center gap-3">
+              <FileText className="h-5 w-5 text-primary" />
+              <h2 className="font-display text-3xl">Billing History</h2>
+            </div>
+            <button
+              onClick={loadInvoices}
+              disabled={invoicesLoading}
+              className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground hover:text-primary transition disabled:opacity-50"
+            >
+              {invoicesLoading ? "Loading…" : "Refresh"}
+            </button>
+          </div>
+
+          {invoicesLoading ? (
+            <div className="flex items-center gap-3 text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" /> Loading invoices…
+            </div>
+          ) : invoices.length === 0 ? (
+            <p className="text-muted-foreground">No invoices yet. Once you subscribe, your receipts will appear here.</p>
+          ) : (
+            <div className="overflow-x-auto -mx-2">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                    <th className="text-left font-normal py-3 px-2">Date</th>
+                    <th className="text-left font-normal py-3 px-2">Invoice</th>
+                    <th className="text-left font-normal py-3 px-2">Amount</th>
+                    <th className="text-left font-normal py-3 px-2">Status</th>
+                    <th className="text-right font-normal py-3 px-2">Receipt</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {invoices.map((inv) => (
+                    <tr key={inv.id} className="border-t border-border/40">
+                      <td className="py-4 px-2 whitespace-nowrap">
+                        {new Date(inv.created).toLocaleDateString()}
+                      </td>
+                      <td className="py-4 px-2 font-mono text-xs text-muted-foreground">
+                        {inv.number ?? inv.id.slice(-8)}
+                      </td>
+                      <td className="py-4 px-2 whitespace-nowrap">
+                        {formatAmount(inv.amountPaid || inv.amountDue, inv.currency)}
+                      </td>
+                      <td className="py-4 px-2">
+                        <span
+                          className={`inline-flex px-2 py-1 rounded-full text-[10px] uppercase tracking-wider ${
+                            inv.status === "paid"
+                              ? "bg-primary/10 text-primary"
+                              : inv.status === "open"
+                                ? "bg-yellow-500/10 text-yellow-500"
+                                : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {inv.status ?? "—"}
+                        </span>
+                      </td>
+                      <td className="py-4 px-2">
+                        <div className="flex items-center justify-end gap-2">
+                          {inv.invoicePdf && (
+                            <a
+                              href={inv.invoicePdf}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full glass gold-border text-[10px] uppercase tracking-[0.2em] hover:bg-accent/40"
+                            >
+                              <Download className="h-3 w-3" /> PDF
+                            </a>
+                          )}
+                          {inv.hostedInvoiceUrl && (
+                            <a
+                              href={inv.hostedInvoiceUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full glass text-[10px] uppercase tracking-[0.2em] hover:bg-accent/40"
+                            >
+                              <ExternalLink className="h-3 w-3" /> View
+                            </a>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           {[
             { icon: Flame, label: "Calories Today", value: "1,248" },
