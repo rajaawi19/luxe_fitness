@@ -161,6 +161,39 @@ export const resumeSubscription = createServerFn({ method: "POST" })
     return { status: updated.status, cancelAtPeriodEnd: updated.cancel_at_period_end };
   });
 
+export const listInvoices = createServerFn({ method: "POST" })
+  .handler(async () => {
+    const stripe = getStripe();
+    const user = await getUserFromRequest();
+    if (!user?.email) throw new Error("You must be signed in");
+
+    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    const customer = customers.data[0];
+    if (!customer) return { invoices: [] };
+
+    const invoices = await stripe.invoices.list({
+      customer: customer.id,
+      limit: 24,
+    });
+
+    return {
+      invoices: invoices.data.map((inv) => ({
+        id: inv.id,
+        number: inv.number,
+        status: inv.status,
+        amountPaid: inv.amount_paid,
+        amountDue: inv.amount_due,
+        currency: inv.currency,
+        created: new Date(inv.created * 1000).toISOString(),
+        periodStart: inv.period_start ? new Date(inv.period_start * 1000).toISOString() : null,
+        periodEnd: inv.period_end ? new Date(inv.period_end * 1000).toISOString() : null,
+        hostedInvoiceUrl: inv.hosted_invoice_url,
+        invoicePdf: inv.invoice_pdf,
+        description: inv.lines.data[0]?.description ?? null,
+      })),
+    };
+  });
+
 export const verifyCheckoutSession = createServerFn({ method: "POST" })
   .inputValidator((input: { sessionId: string }) => input)
   .handler(async ({ data }) => {
