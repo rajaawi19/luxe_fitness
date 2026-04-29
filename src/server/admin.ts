@@ -282,7 +282,11 @@ export const compMembership = createServerFn({ method: "POST" })
       max_redemptions: 1,
     });
 
-    // Trial-only subscription using a $0 price (creates via inline price_data)
+    // Create a product first (Stripe requires product, not inline product_data, for sub items)
+    const product = await stripe.products.create({
+      name: `RKDF ${data.planLabel} (Comp)`,
+    });
+
     const sub = await stripe.subscriptions.create({
       customer: customer.id,
       items: [
@@ -290,7 +294,7 @@ export const compMembership = createServerFn({ method: "POST" })
           price_data: {
             currency: "inr",
             recurring: { interval: "month" },
-            product_data: { name: `RKDF ${data.planLabel} (Comp)` },
+            product: product.id,
             unit_amount: 0,
           },
         },
