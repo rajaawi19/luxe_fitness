@@ -4,6 +4,7 @@ import { Check, Loader2, Sparkles } from "lucide-react";
 import { verifyCheckoutSession } from "@/server/stripe";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { trackEvent } from "@/lib/track";
 
 export const Route = createFileRoute("/checkout/success")({
   head: () => ({
@@ -46,6 +47,11 @@ function CheckoutSuccessPage() {
         if (!result.paid) throw new Error("Payment not completed");
         setInfo(result);
         setState("ok");
+        trackEvent("checkout_completed", {
+          plan: result.plan,
+          amountTotal: result.amountTotal,
+          currency: result.currency,
+        });
         toast.success(`${result.plan} membership activated`);
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Verification failed";

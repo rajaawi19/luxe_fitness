@@ -193,12 +193,20 @@ function DashboardPage() {
             </h1>
             <p className="text-muted-foreground mt-2">{user.email}</p>
           </div>
-          <button
-            onClick={signOut}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full glass gold-border text-xs uppercase tracking-[0.2em] hover:bg-accent/40 transition"
-          >
-            <LogOut className="h-4 w-4" /> Sign out
-          </button>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/admin"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full glass gold-border text-xs uppercase tracking-[0.2em] hover:bg-accent/40 transition"
+            >
+              <Settings className="h-4 w-4" /> Admin
+            </Link>
+            <button
+              onClick={signOut}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full glass gold-border text-xs uppercase tracking-[0.2em] hover:bg-accent/40 transition"
+            >
+              <LogOut className="h-4 w-4" /> Sign out
+            </button>
+          </div>
         </div>
 
         {/* Membership card */}
