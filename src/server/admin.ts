@@ -244,11 +244,12 @@ export const refundInvoice = createServerFn({ method: "POST" })
     const { user } = await requireAdmin();
     const stripe = getStripe();
 
-    const invoice = await stripe.invoices.retrieve(data.invoiceId);
-    if (!invoice.payment_intent) throw new Error("Invoice has no payment to refund");
+    const invoice = await stripe.invoices.retrieve(data.invoiceId) as any;
+    const paymentIntent = invoice.payment_intent;
+    if (!paymentIntent) throw new Error("Invoice has no payment to refund");
 
     const refund = await stripe.refunds.create({
-      payment_intent: invoice.payment_intent as string,
+      payment_intent: paymentIntent as string,
       reason: "requested_by_customer",
       metadata: { admin_user_id: user.id, note: data.reason ?? "" },
     });
