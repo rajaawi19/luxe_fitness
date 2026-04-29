@@ -70,8 +70,14 @@ function MembershipPage() {
   const navigate = useNavigate();
   const [loadingPlan, setLoadingPlan] = useState<PlanName | null>(null);
 
+  useEffect(() => {
+    trackEvent("membership_page_viewed");
+    plans.forEach((p) => trackEvent("plan_viewed", { plan: p.name, price: p.price }));
+  }, []);
+
   const handleSelect = async (plan: PlanName) => {
     setLoadingPlan(plan);
+    trackEvent("checkout_started", { plan });
     try {
       const { data: sess } = await supabase.auth.getSession();
       if (!sess.session) {
