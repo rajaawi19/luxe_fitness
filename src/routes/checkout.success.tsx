@@ -47,6 +47,11 @@ function CheckoutSuccessPage() {
         if (!result.paid) throw new Error("Payment not completed");
         setInfo(result);
         setState("ok");
+        trackEvent("checkout_completed", {
+          plan: result.plan,
+          amountTotal: result.amountTotal,
+          currency: result.currency,
+        });
         toast.success(`${result.plan} membership activated`);
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Verification failed";
