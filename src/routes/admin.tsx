@@ -206,6 +206,71 @@ function AdminPage() {
     }
   };
 
+  const reloadAuthUsers = useCallback(async () => {
+    const r = await withAuth((a) =>
+      listAuthUsers({ data: { search: userSearch }, headers: { Authorization: a } } as any),
+    );
+    setAuthUsers(r);
+  }, [userSearch]);
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newUserEmail || !newUserPassword) return;
+    setCreatingUser(true);
+    try {
+      await withAuth((a) =>
+        createAuthUser({
+          data: { email: newUserEmail, password: newUserPassword, isAdmin: newUserAdmin },
+          headers: { Authorization: a },
+        } as any),
+      );
+      toast.success(`User ${newUserEmail} created`);
+      setNewUserEmail("");
+      setNewUserPassword("");
+      setNewUserAdmin(false);
+      await reloadAuthUsers();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not create user");
+    } finally {
+      setCreatingUser(false);
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, email: string | null) => {
+    if (!confirm(`Permanently delete ${email ?? "this user"}? This cannot be undone.`)) return;
+    setDeletingUser(userId);
+    try {
+      await withAuth((a) =>
+        deleteAuthUser({ data: { userId }, headers: { Authorization: a } } as any),
+      );
+      toast.success("User deleted");
+      await reloadAuthUsers();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Delete failed");
+    } finally {
+      setDeletingUser(null);
+    }
+  };
+
+  const handleToggleAdmin = async (userId: string, makeAdmin: boolean) => {
+    setTogglingRole(userId);
+    try {
+      await withAuth((a) =>
+        setUserAdminRole({ data: { userId, makeAdmin }, headers: { Authorization: a } } as any),
+      );
+      toast.success(makeAdmin ? "Granted admin" : "Revoked admin");
+      await reloadAuthUsers();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Role change failed");
+    } finally {
+      setTogglingRole(null);
+    }
+  };
+
+  useEffect(() => {
+    if (isAdmin) reloadAuthUsers();
+  }, [userSearch, isAdmin, reloadAuthUsers]);
+
   const filteredMembers = useMemo(() => {
     if (!members) return [];
     const q = memberSearch.trim().toLowerCase();
