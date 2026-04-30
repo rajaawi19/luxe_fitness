@@ -447,6 +447,161 @@ function AdminPage() {
           </Card>
         </div>
 
+        {/* User Accounts */}
+        <Card className="mb-10">
+          <CardHeader
+            title="User Accounts"
+            icon={<Users className="h-5 w-5" />}
+            right={
+              <span className="text-xs text-muted-foreground">
+                {authUsers ? `${authUsers.users.length} accounts` : "—"}
+              </span>
+            }
+          />
+          <div className="px-6 pb-6">
+            <form onSubmit={handleCreateUser} className="grid md:grid-cols-[1fr_1fr_auto_auto] gap-3 mb-6 p-4 rounded-xl bg-background/40 border border-border/40">
+              <input
+                type="email"
+                required
+                value={newUserEmail}
+                onChange={(e) => setNewUserEmail(e.target.value)}
+                placeholder="user@example.com"
+                className="px-4 py-2 rounded-lg bg-background border border-border focus:outline-none focus:border-accent text-sm"
+              />
+              <input
+                type="password"
+                required
+                minLength={8}
+                value={newUserPassword}
+                onChange={(e) => setNewUserPassword(e.target.value)}
+                placeholder="Password (min 8 chars)"
+                className="px-4 py-2 rounded-lg bg-background border border-border focus:outline-none focus:border-accent text-sm"
+              />
+              <label className="flex items-center gap-2 px-3 text-xs uppercase tracking-wider text-muted-foreground cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={newUserAdmin}
+                  onChange={(e) => setNewUserAdmin(e.target.checked)}
+                  className="accent-amber-400"
+                />
+                Admin
+              </label>
+              <button
+                type="submit"
+                disabled={creatingUser || !newUserEmail || !newUserPassword}
+                className="flex items-center justify-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-400 text-background text-xs uppercase tracking-[0.2em] font-medium hover:opacity-90 transition disabled:opacity-50"
+              >
+                {creatingUser ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UserPlus className="h-3.5 w-3.5" />}
+                Add User
+              </button>
+            </form>
+
+            <div className="relative mb-4">
+              <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                value={userSearch}
+                onChange={(e) => setUserSearch(e.target.value)}
+                placeholder="Search by email…"
+                className="w-full pl-10 pr-4 py-2 rounded-lg bg-background border border-border focus:outline-none focus:border-accent text-sm"
+              />
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="text-xs uppercase tracking-wider text-muted-foreground border-b border-border">
+                  <tr>
+                    <th className="text-left py-2 px-2">Email</th>
+                    <th className="text-left py-2 px-2">Roles</th>
+                    <th className="text-left py-2 px-2">Joined</th>
+                    <th className="text-left py-2 px-2">Last sign-in</th>
+                    <th className="text-right py-2 px-2">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {authUsers?.users.map((u) => {
+                    const isAdminUser = u.roles.includes("admin");
+                    const isSelf = u.id === user?.id;
+                    return (
+                      <tr key={u.id} className="border-b border-border/40 hover:bg-accent/10">
+                        <td className="py-2 px-2">
+                          {u.email ?? "—"}
+                          {isSelf && <span className="ml-2 text-xs text-amber-300">(you)</span>}
+                          {!u.emailConfirmedAt && (
+                            <span className="ml-2 text-xs px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">unverified</span>
+                          )}
+                        </td>
+                        <td className="py-2 px-2">
+                          <div className="flex gap-1 flex-wrap">
+                            {u.roles.length === 0 && <span className="text-xs text-muted-foreground">—</span>}
+                            {u.roles.map((r) => (
+                              <span
+                                key={r}
+                                className={`text-xs px-1.5 py-0.5 rounded ${
+                                  r === "admin" ? "bg-amber-500/20 text-amber-300" : "bg-muted text-muted-foreground"
+                                }`}
+                              >
+                                {r}
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+                        <td className="py-2 px-2 text-muted-foreground text-xs">
+                          {new Date(u.createdAt).toLocaleDateString()}
+                        </td>
+                        <td className="py-2 px-2 text-muted-foreground text-xs">
+                          {u.lastSignInAt ? new Date(u.lastSignInAt).toLocaleDateString() : "never"}
+                        </td>
+                        <td className="py-2 px-2 text-right">
+                          <div className="flex justify-end gap-2">
+                            <button
+                              onClick={() => handleToggleAdmin(u.id, !isAdminUser)}
+                              disabled={togglingRole === u.id || (isSelf && isAdminUser)}
+                              title={isSelf && isAdminUser ? "Can't revoke your own admin" : isAdminUser ? "Revoke admin" : "Make admin"}
+                              className="text-xs inline-flex items-center gap-1 px-2 py-1 rounded hover:bg-accent/40 disabled:opacity-40 transition"
+                            >
+                              {togglingRole === u.id ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <Shield className="h-3 w-3" />
+                              )}
+                              {isAdminUser ? "Revoke" : "Make admin"}
+                            </button>
+                            <button
+                              onClick={() => handleDeleteUser(u.id, u.email)}
+                              disabled={deletingUser === u.id || isSelf}
+                              title={isSelf ? "Can't delete yourself" : "Delete user"}
+                              className="text-xs inline-flex items-center gap-1 px-2 py-1 rounded text-red-400 hover:bg-red-500/10 disabled:opacity-40 transition"
+                            >
+                              {deletingUser === u.id ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-3 w-3" />
+                              )}
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {!authUsers && (
+                    <tr>
+                      <td colSpan={5} className="py-6 text-center text-muted-foreground">
+                        <Loader2 className="h-4 w-4 animate-spin inline mr-2" /> Loading users…
+                      </td>
+                    </tr>
+                  )}
+                  {authUsers?.users.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="py-6 text-center text-muted-foreground">No users found.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </Card>
+
         {/* Members */}
         <Card className="mb-10">
           <CardHeader title="Members" icon={<Users className="h-5 w-5" />} />
