@@ -388,6 +388,98 @@ export const getFunnelAnalytics = createServerFn({ method: "POST" })
     };
   });
 
+// ───────────────────────── User accounts (auth) ─────────────────────────
+
+export const listAuthUsers = createServerFn({ method: "POST" })
+  .inputValidator((input: { search?: string; page?: number }) => input ?? {})
+  .handler(async ({ data }) => {
+    const { admin } = await requireAdmin();
+    const page = data.page ?? 1;
+    const { data: list, error } = await admin.auth.admin.listUsers({ page, perPage: 200 });
+    if (error) throw new Error(error.message);
+
+    const { data: roles } = await admin.from("user_roles").select("user_id, role");
+    const roleMap = new Map<string, string[]>();
+    for (const r of roles ?? []) {
+      const arr = roleMap.get((r as any).user_id) ?? [];
+      arr.push((r as any).role);
+      roleMap.set((r as any).user_id, arr);
+    }
+
+    const q = (data.search ?? "").trim().toLowerCase();
+    const users = list.users
+      .map((u) => ({
+        id: u.id,
+        email: u.email ?? null,
+        createdAt: u.created_at,
+        lastSignInAt: u.last_sign_in_at ?? null,
+        emailConfirmedAt: u.email_confirmed_at ?? null,
+        roles: roleMap.get(u.id) ?? [],
+      }))
+      .filter((u) => (q ? (u.email ?? "").toLowerCase().includes(q) : true));
+
+    return { users, total: list.users.length };
+  });
+
+export const createAuthUser = createServerFn({ method: "POST" })
+  .inputValidator((input: { email: string; password: string; isAdmin?: boolean }) => input)
+  .handler(async ({ data }) => {
+    const { user, admin } = await requireAdmin();
+    if (!data.email || !data.password) throw new Error("Email and password required");
+    if (data.password.length < 8) throw new Error("Password must be at least 8 characters");
+
+    const { data: created, error } = await admin.auth.admin.createUser({
+      email: data.email,
+      password: data.password,
+      email_confirm: true,
+    });
+    if (error) throw new Error(error.message);
+    if (!created.user) throw new Error("User creation failed");
+
+    const role = data.isAdmin ? "admin" : "member";
+    await admin.from("user_roles").insert({ user_id: created.user.id, role }).select();
+
+    await logAudit(user.id, "user.create", created.user.id, {
+      email: data.email,
+      role,
+    });
+
+    return { id: created.user.id, email: created.user.email };
+  });
+
+export const deleteAuthUser = createServerFn({ method: "POST" })
+  .inputValidator((input: { userId: string }) => input)
+  .handler(async ({ data }) => {
+    const { user, admin } = await requireAdmin();
+    if (data.userId === user.id) throw new Error("You cannot delete your own account");
+
+    // Clean up roles first (FK-safe even though there's no FK)
+    await admin.from("user_roles").delete().eq("user_id", data.userId);
+
+    const { error } = await admin.auth.admin.deleteUser(data.userId);
+    if (error) throw new Error(error.message);
+
+    await logAudit(user.id, "user.delete", data.userId, {});
+
+    return { ok: true };
+  });
+
+export const setUserAdminRole = createServerFn({ method: "POST" })
+  .inputValidator((input: { userId: string; makeAdmin: boolean }) => input)
+  .handler(async ({ data }) => {
+    const { user, admin } = await requireAdmin();
+    if (data.userId === user.id && !data.makeAdmin) {
+      throw new Error("You cannot remove your own admin role");
+    }
+    if (data.makeAdmin) {
+      await admin.from("user_roles").insert({ user_id: data.userId, role: "admin" }).select();
+    } else {
+      await admin.from("user_roles").delete().eq("user_id", data.userId).eq("role", "admin");
+    }
+    await logAudit(user.id, data.makeAdmin ? "role.grant_admin" : "role.revoke_admin", data.userId, {});
+    return { ok: true };
+  });
+
 // ───────────────────────── Role check (client-callable) ─────────────────────────
 
 export const checkIsAdmin = createServerFn({ method: "POST" })
