@@ -15,20 +15,27 @@ import {
   Receipt,
   RefreshCw,
   Search,
+  Shield,
   ShieldAlert,
+  Trash2,
   TrendingDown,
   TrendingUp,
+  UserPlus,
   Users,
 } from "lucide-react";
 import {
   checkIsAdmin,
   compMembership,
+  createAuthUser,
+  deleteAuthUser,
   getAdminOverview,
   getFunnelAnalytics,
   listAdminInvoices,
   listAdminMembers,
   listAuditLog,
+  listAuthUsers,
   refundInvoice,
+  setUserAdminRole,
 } from "@/server/admin";
 
 export const Route = createFileRoute("/admin")({
