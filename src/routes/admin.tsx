@@ -96,6 +96,16 @@ function AdminPage() {
   const [compPlan, setCompPlan] = useState("Basic");
   const [compLoading, setCompLoading] = useState(false);
 
+  // User accounts
+  const [authUsers, setAuthUsers] = useState<AuthUsers | null>(null);
+  const [userSearch, setUserSearch] = useState("");
+  const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserPassword, setNewUserPassword] = useState("");
+  const [newUserAdmin, setNewUserAdmin] = useState(false);
+  const [creatingUser, setCreatingUser] = useState(false);
+  const [deletingUser, setDeletingUser] = useState<string | null>(null);
+  const [togglingRole, setTogglingRole] = useState<string | null>(null);
+
   const reloadAll = useCallback(async () => {
     const calls = [
       withAuth((a) => getAdminOverview({ headers: { Authorization: a } } as any)).then(setOverview),
@@ -103,9 +113,10 @@ function AdminPage() {
       withAuth((a) => listAdminInvoices({ data: { days: invDays, status: invStatus }, headers: { Authorization: a } } as any)).then(setInvoices),
       withAuth((a) => listAuditLog({ data: { limit: 50 }, headers: { Authorization: a } } as any)).then(setAudit),
       withAuth((a) => getFunnelAnalytics({ data: { days: 30 }, headers: { Authorization: a } } as any)).then(setFunnel),
+      withAuth((a) => listAuthUsers({ data: { search: userSearch }, headers: { Authorization: a } } as any)).then(setAuthUsers),
     ];
     await Promise.allSettled(calls);
-  }, [memberSearch, invDays, invStatus]);
+  }, [memberSearch, invDays, invStatus, userSearch]);
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
