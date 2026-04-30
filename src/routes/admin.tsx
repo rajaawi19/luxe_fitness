@@ -48,6 +48,7 @@ type Members = Awaited<ReturnType<typeof listAdminMembers>>;
 type Invoices = Awaited<ReturnType<typeof listAdminInvoices>>;
 type Audit = Awaited<ReturnType<typeof listAuditLog>>;
 type Funnel = Awaited<ReturnType<typeof getFunnelAnalytics>>;
+type AuthUsers = Awaited<ReturnType<typeof listAuthUsers>>;
 
 function fmt(amount: number, currency = "inr") {
   const n = (amount ?? 0) / 100;
