@@ -270,6 +270,32 @@ function AdminPage() {
     }
   };
 
+  const handleResetPassword = async (userId: string, email: string | null) => {
+    if (!confirm(`Send a secure password reset for ${email ?? "this user"}?`)) return;
+    setResettingPw(userId);
+    try {
+      const redirectTo = `${window.location.origin}/auth`;
+      const res = await withAuth((a) =>
+        resetUserPassword({ data: { userId, redirectTo }, headers: { Authorization: a } } as any),
+      );
+      const link = (res as any)?.actionLink as string | null;
+      if (link) {
+        try {
+          await navigator.clipboard.writeText(link);
+          toast.success("Recovery link copied to clipboard");
+        } catch {
+          toast.success("Recovery link generated", { description: link });
+        }
+      } else {
+        toast.success(`Password reset email sent to ${email}`);
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Reset failed");
+    } finally {
+      setResettingPw(null);
+    }
+  };
+
   useEffect(() => {
     if (isAdmin) reloadAuthUsers();
   }, [userSearch, isAdmin, reloadAuthUsers]);
