@@ -107,6 +107,7 @@ function AdminPage() {
   const [creatingUser, setCreatingUser] = useState(false);
   const [deletingUser, setDeletingUser] = useState<string | null>(null);
   const [togglingRole, setTogglingRole] = useState<string | null>(null);
+  const [resettingPw, setResettingPw] = useState<string | null>(null);
 
   const reloadAll = useCallback(async () => {
     const calls = [
