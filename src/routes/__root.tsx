@@ -1,6 +1,7 @@
 import { Outlet, createRootRoute, HeadContent, Scripts, Link } from "@tanstack/react-router";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
+import { RouteTransition } from "@/components/site/RouteTransition";
 import { Toaster } from "@/components/ui/sonner";
 
 import appCss from "../styles.css?url";
