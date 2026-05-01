@@ -1,6 +1,7 @@
 import { Outlet, createRootRoute, HeadContent, Scripts, Link } from "@tanstack/react-router";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
+import { RouteTransition } from "@/components/site/RouteTransition";
 import { Toaster } from "@/components/ui/sonner";
 
 import appCss from "../styles.css?url";
@@ -73,8 +74,10 @@ function RootComponent() {
   return (
     <>
       <Navbar />
-      <main className="pt-20">
-        <Outlet />
+      <main className="pt-20 min-h-[calc(100vh-5rem)]">
+        <RouteTransition>
+          <Outlet />
+        </RouteTransition>
       </main>
       <Footer />
       <Toaster />

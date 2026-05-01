@@ -224,6 +224,9 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  /* Reserve scrollbar gutter so short pages don't shift content horizontally
+     when navigating to a tall page that introduces a scrollbar. */
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -252,5 +255,18 @@ img { max-width: 100%; height: auto; }
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ─────── Route transitions ─────── */
+@keyframes route-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.route-transition {
+  animation: route-enter 0.45s var(--ease-luxury, cubic-bezier(0.4, 0, 0.2, 1)) both;
+  will-change: opacity, transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .route-transition { animation: none; }
 }
 
