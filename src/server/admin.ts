@@ -464,6 +464,36 @@ export const deleteAuthUser = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const resetUserPassword = createServerFn({ method: "POST" })
+  .inputValidator((input: { userId: string; redirectTo?: string }) => input)
+  .handler(async ({ data }) => {
+    const { user, admin } = await requireAdmin();
+
+    // Look up the user's email
+    const { data: target, error: getErr } = await admin.auth.admin.getUserById(data.userId);
+    if (getErr) throw new Error(getErr.message);
+    const email = target.user?.email;
+    if (!email) throw new Error("User has no email on file");
+
+    // Generate a secure recovery link (does not change the password itself).
+    // The link, when opened, lets the user set a new password via the standard
+    // Supabase recovery flow.
+    const { data: link, error } = await admin.auth.admin.generateLink({
+      type: "recovery",
+      email,
+      options: data.redirectTo ? { redirectTo: data.redirectTo } : undefined,
+    });
+    if (error) throw new Error(error.message);
+
+    await logAudit(user.id, "user.password_reset", data.userId, { email });
+
+    return {
+      ok: true,
+      email,
+      actionLink: link.properties?.action_link ?? null,
+    };
+  });
+
 export const setUserAdminRole = createServerFn({ method: "POST" })
   .inputValidator((input: { userId: string; makeAdmin: boolean }) => input)
   .handler(async ({ data }) => {

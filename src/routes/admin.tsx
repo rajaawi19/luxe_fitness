@@ -11,6 +11,7 @@ import {
   Download,
   ExternalLink,
   Gift,
+  KeyRound,
   Loader2,
   Receipt,
   RefreshCw,
@@ -35,6 +36,7 @@ import {
   listAuditLog,
   listAuthUsers,
   refundInvoice,
+  resetUserPassword,
   setUserAdminRole,
 } from "@/server/admin";
 
@@ -105,6 +107,7 @@ function AdminPage() {
   const [creatingUser, setCreatingUser] = useState(false);
   const [deletingUser, setDeletingUser] = useState<string | null>(null);
   const [togglingRole, setTogglingRole] = useState<string | null>(null);
+  const [resettingPw, setResettingPw] = useState<string | null>(null);
 
   const reloadAll = useCallback(async () => {
     const calls = [
@@ -264,6 +267,32 @@ function AdminPage() {
       toast.error(err instanceof Error ? err.message : "Role change failed");
     } finally {
       setTogglingRole(null);
+    }
+  };
+
+  const handleResetPassword = async (userId: string, email: string | null) => {
+    if (!confirm(`Send a secure password reset for ${email ?? "this user"}?`)) return;
+    setResettingPw(userId);
+    try {
+      const redirectTo = `${window.location.origin}/auth`;
+      const res = await withAuth((a) =>
+        resetUserPassword({ data: { userId, redirectTo }, headers: { Authorization: a } } as any),
+      );
+      const link = (res as any)?.actionLink as string | null;
+      if (link) {
+        try {
+          await navigator.clipboard.writeText(link);
+          toast.success("Recovery link copied to clipboard");
+        } catch {
+          toast.success("Recovery link generated", { description: link });
+        }
+      } else {
+        toast.success(`Password reset email sent to ${email}`);
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Reset failed");
+    } finally {
+      setResettingPw(null);
     }
   };
 
@@ -565,6 +594,19 @@ function AdminPage() {
                                 <Shield className="h-3 w-3" />
                               )}
                               {isAdminUser ? "Revoke" : "Make admin"}
+                            </button>
+                            <button
+                              onClick={() => handleResetPassword(u.id, u.email)}
+                              disabled={resettingPw === u.id || !u.email}
+                              title={!u.email ? "User has no email" : "Send password reset"}
+                              className="text-xs inline-flex items-center gap-1 px-2 py-1 rounded text-amber-300 hover:bg-amber-500/10 disabled:opacity-40 transition"
+                            >
+                              {resettingPw === u.id ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <KeyRound className="h-3 w-3" />
+                              )}
+                              Reset password
                             </button>
                             <button
                               onClick={() => handleDeleteUser(u.id, u.email)}
