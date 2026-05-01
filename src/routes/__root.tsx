@@ -74,8 +74,10 @@ function RootComponent() {
   return (
     <>
       <Navbar />
-      <main className="pt-20">
-        <Outlet />
+      <main className="pt-20 min-h-[calc(100vh-5rem)]">
+        <RouteTransition>
+          <Outlet />
+        </RouteTransition>
       </main>
       <Footer />
       <Toaster />
