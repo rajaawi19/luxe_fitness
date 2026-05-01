@@ -257,3 +257,16 @@ img { max-width: 100%; height: auto; }
   }
 }
 
+/* ─────── Route transitions ─────── */
+@keyframes route-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.route-transition {
+  animation: route-enter 0.45s var(--ease-luxury, cubic-bezier(0.4, 0, 0.2, 1)) both;
+  will-change: opacity, transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .route-transition { animation: none; }
+}
+
