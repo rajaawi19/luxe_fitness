@@ -596,6 +596,19 @@ function AdminPage() {
                               {isAdminUser ? "Revoke" : "Make admin"}
                             </button>
                             <button
+                              onClick={() => handleResetPassword(u.id, u.email)}
+                              disabled={resettingPw === u.id || !u.email}
+                              title={!u.email ? "User has no email" : "Send password reset"}
+                              className="text-xs inline-flex items-center gap-1 px-2 py-1 rounded text-amber-300 hover:bg-amber-500/10 disabled:opacity-40 transition"
+                            >
+                              {resettingPw === u.id ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <KeyRound className="h-3 w-3" />
+                              )}
+                              Reset password
+                            </button>
+                            <button
                               onClick={() => handleDeleteUser(u.id, u.email)}
                               disabled={deletingUser === u.id || isSelf}
                               title={isSelf ? "Can't delete yourself" : "Delete user"}
