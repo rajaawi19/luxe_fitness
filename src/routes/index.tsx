@@ -42,9 +42,9 @@ function HomePage() {
               </span>
             </div>
             <h1 className="animate-fade-up delay-100 font-display text-5xl md:text-7xl lg:text-8xl leading-[0.95] mb-8">
-              Where strength
+              Elevate your fitness
               <br />
-              meets <span className="text-gradient-gold italic">intelligence</span>.
+              to a <span className="text-gradient-gold italic">lifestyle</span> of distinction.
             </h1>
             <p className="animate-fade-up delay-200 text-lg md:text-xl text-muted-foreground max-w-xl mb-12 leading-relaxed">
               RKDF is the world's first luxury AI-powered fitness sanctuary —
