@@ -5,15 +5,22 @@ import { createCheckoutSession, type PlanName } from "@/server/stripe";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { trackEvent } from "@/lib/track";
+import { canonical } from "@/lib/seo";
 
 export const Route = createFileRoute("/membership")({
   head: () => ({
     meta: [
-      { title: "Membership — RKDF Gym" },
-      { name: "description", content: "Choose from Basic, Premium, or Elite membership at RKDF — luxury AI fitness curated for you." },
-      { property: "og:title", content: "RKDF Membership — Basic, Premium, Elite" },
-      { property: "og:description", content: "Three tiers of luxury AI fitness." },
+      { title: "Membership — Basic, Premium & Elite Plans at RKDF Gym" },
+      { name: "description", content: "Choose Basic, Premium, or Elite membership at RKDF — luxury AI fitness curated for your lifestyle, with concierge access and personalized programming." },
+      { property: "og:title", content: "Membership — Basic, Premium & Elite Plans at RKDF Gym" },
+      { property: "og:description", content: "Three tiers of luxury AI fitness — pick the plan that fits your lifestyle." },
+      { property: "og:type", content: "product" },
+      { property: "og:url", content: canonical("/membership") },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Membership — Basic, Premium & Elite Plans at RKDF Gym" },
+      { name: "twitter:description", content: "Three tiers of luxury AI fitness — pick the plan that fits your lifestyle." },
     ],
+    links: [{ rel: "canonical", href: canonical("/membership") }],
   }),
   component: MembershipPage,
 });

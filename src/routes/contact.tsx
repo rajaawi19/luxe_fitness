@@ -1,14 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { canonical } from "@/lib/seo";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact — RKDF Gym" },
-      { name: "description", content: "Visit RKDF in Mumbai or reach our concierge team. We respond within an hour." },
-      { property: "og:title", content: "Contact RKDF Gym" },
-      { property: "og:description", content: "Speak with our concierge." },
+      { title: "Contact — Visit the RKDF Sanctuary in Mumbai" },
+      { name: "description", content: "Visit RKDF in Mumbai or reach our concierge team for tours, private consultations, and membership inquiries — we respond within an hour." },
+      { property: "og:title", content: "Contact — Visit the RKDF Sanctuary in Mumbai" },
+      { property: "og:description", content: "Tour the sanctuary, book a private consultation, or speak with our concierge." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: canonical("/contact") },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Contact — Visit the RKDF Sanctuary in Mumbai" },
+      { name: "twitter:description", content: "Tour the sanctuary, book a private consultation, or speak with our concierge." },
     ],
+    links: [{ rel: "canonical", href: canonical("/contact") }],
   }),
   component: ContactPage,
 });

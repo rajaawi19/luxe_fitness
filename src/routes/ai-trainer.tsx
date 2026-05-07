@@ -1,15 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Brain, Eye, Mic, HeartPulse, ShieldCheck, Zap } from "lucide-react";
 import aiImg from "@/assets/ai-trainer.jpg";
+import { canonical } from "@/lib/seo";
 
 export const Route = createFileRoute("/ai-trainer")({
   head: () => ({
     meta: [
-      { title: "AI Trainer — RKDF Gym" },
-      { name: "description", content: "Meet the RKDF AI Trainer — adaptive workouts, computer vision form correction, and predictive recovery." },
-      { property: "og:title", content: "RKDF AI Trainer" },
-      { property: "og:description", content: "An intelligent coach that learns you." },
+      { title: "AI Trainer — Adaptive Coaching at RKDF Gym" },
+      { name: "description", content: "Meet the RKDF AI Trainer — adaptive workouts, computer vision form correction, biometric sync, and predictive recovery." },
+      { property: "og:title", content: "AI Trainer — Adaptive Coaching at RKDF Gym" },
+      { property: "og:description", content: "An intelligent coach that learns you — adaptive programming, vision-based form, predictive recovery." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: canonical("/ai-trainer") },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "AI Trainer — Adaptive Coaching at RKDF Gym" },
+      { name: "twitter:description", content: "An intelligent coach that learns you — adaptive programming, vision-based form, predictive recovery." },
     ],
+    links: [{ rel: "canonical", href: canonical("/ai-trainer") }],
   }),
   component: AiTrainerPage,
 });

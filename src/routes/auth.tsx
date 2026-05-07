@@ -7,9 +7,11 @@ import { Loader2 } from "lucide-react";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign In — RKDF Gym" },
-      { name: "description", content: "Access your RKDF member portal." },
+      { title: "Sign In or Join — RKDF Gym Member Portal" },
+      { name: "description", content: "Access your RKDF member portal — sign in or create an account to manage your membership, classes, and AI training." },
+      { name: "robots", content: "noindex" },
     ],
+    links: [{ rel: "canonical", href: "https://id-preview--b367f66d-dc3a-4eee-818a-a27521508023.lovable.app/auth" }],
   }),
   component: AuthPage,
 });
