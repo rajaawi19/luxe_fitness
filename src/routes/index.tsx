@@ -7,10 +7,14 @@ import equipImg from "@/assets/equipment.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "RKDF Gym — Luxury AI Fitness Sanctuary" },
-      { name: "description", content: "Step into the world's most advanced luxury fitness sanctuary. AI trainers, smart equipment, elite membership." },
-      { property: "og:title", content: "RKDF Gym — Luxury AI Fitness Sanctuary" },
-      { property: "og:description", content: "Where elite training meets intelligent design." },
+      { title: "RKDF Gym — Elevate Your Fitness to a Lifestyle of Distinction" },
+      { name: "description", content: "Elevate your fitness to a lifestyle of distinction. RKDF is the world's first luxury AI-powered fitness sanctuary." },
+      { property: "og:title", content: "Elevate Your Fitness to a Lifestyle of Distinction — RKDF" },
+      { property: "og:description", content: "The world's first luxury AI-powered fitness sanctuary. Elite training, smart equipment, distinguished living." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Elevate Your Fitness to a Lifestyle of Distinction — RKDF" },
+      { name: "twitter:description", content: "The world's first luxury AI-powered fitness sanctuary. Elite training, smart equipment, distinguished living." },
     ],
   }),
   component: HomePage,
