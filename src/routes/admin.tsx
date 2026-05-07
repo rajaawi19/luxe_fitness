@@ -41,7 +41,13 @@ import {
 } from "@/server/admin";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Admin — RKDF Gym" }] }),
+  head: () => ({
+    meta: [
+      { title: "Admin Console — RKDF Gym" },
+      { name: "description", content: "Internal RKDF admin console for managing members, memberships, and operations." },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
   component: AdminPage,
 });
 

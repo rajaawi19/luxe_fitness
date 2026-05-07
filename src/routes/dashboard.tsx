@@ -46,7 +46,11 @@ import {
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
-    meta: [{ title: "Dashboard — RKDF Gym" }],
+    meta: [
+      { title: "Member Dashboard — RKDF Gym" },
+      { name: "description", content: "Your personal RKDF dashboard — membership, invoices, AI training insights, and concierge tools." },
+      { name: "robots", content: "noindex" },
+    ],
   }),
   component: DashboardPage,
 });

@@ -3,6 +3,7 @@ import { ArrowRight, Sparkles, Activity, Dumbbell, Users, Award, Cpu } from "luc
 import heroImg from "@/assets/hero-gym.jpg";
 import aiImg from "@/assets/ai-trainer.jpg";
 import equipImg from "@/assets/equipment.jpg";
+import { canonical } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -12,10 +13,12 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Elevate Your Fitness to a Lifestyle of Distinction — RKDF" },
       { property: "og:description", content: "The world's first luxury AI-powered fitness sanctuary. Elite training, smart equipment, distinguished living." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: canonical("/") },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Elevate Your Fitness to a Lifestyle of Distinction — RKDF" },
       { name: "twitter:description", content: "The world's first luxury AI-powered fitness sanctuary. Elite training, smart equipment, distinguished living." },
     ],
+    links: [{ rel: "canonical", href: canonical("/") }],
   }),
   component: HomePage,
 });
