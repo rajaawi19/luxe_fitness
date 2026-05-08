@@ -130,6 +130,7 @@
 
 @layer utilities {
   .font-display { font-family: var(--font-display); }
+  .font-editorial { font-family: var(--font-editorial); font-feature-settings: "liga", "dlig", "swsh"; }
   .text-gradient-gold {
     background: var(--gradient-gold);
     -webkit-background-clip: text;
