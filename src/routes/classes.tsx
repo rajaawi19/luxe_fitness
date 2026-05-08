@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Clock, Users } from "lucide-react";
-import { canonical } from "@/lib/seo";
+import { canonical, organizationJsonLd, webpageJsonLd, jsonLdScript } from "@/lib/seo";
 
 export const Route = createFileRoute("/classes")({
   head: () => ({
@@ -16,6 +16,14 @@ export const Route = createFileRoute("/classes")({
       { name: "twitter:description", content: "Elite group classes for body and mind, led by world-class coaches and AI." },
     ],
     links: [{ rel: "canonical", href: canonical("/classes") }],
+    scripts: [
+      jsonLdScript(organizationJsonLd()),
+      jsonLdScript(webpageJsonLd({
+        name: "Classes — Curated Luxury Fitness at RKDF Gym",
+        description: "Curated luxury fitness classes — strength, mobility, breathwork, power yoga, boxing, and AI-led HIIT.",
+        path: "/classes",
+      })),
+    ],
   }),
   component: ClassesPage,
 });

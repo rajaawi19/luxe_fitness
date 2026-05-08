@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Brain, Eye, Mic, HeartPulse, ShieldCheck, Zap } from "lucide-react";
 import aiImg from "@/assets/ai-trainer.jpg";
-import { canonical } from "@/lib/seo";
+import { canonical, organizationJsonLd, webpageJsonLd, jsonLdScript } from "@/lib/seo";
 
 export const Route = createFileRoute("/ai-trainer")({
   head: () => ({
@@ -17,6 +17,14 @@ export const Route = createFileRoute("/ai-trainer")({
       { name: "twitter:description", content: "An intelligent coach that learns you — adaptive programming, vision-based form, predictive recovery." },
     ],
     links: [{ rel: "canonical", href: canonical("/ai-trainer") }],
+    scripts: [
+      jsonLdScript(organizationJsonLd()),
+      jsonLdScript(webpageJsonLd({
+        name: "AI Trainer — Adaptive Coaching at RKDF Gym",
+        description: "Meet the RKDF AI Trainer — adaptive workouts, computer vision form correction, biometric sync, and predictive recovery.",
+        path: "/ai-trainer",
+      })),
+    ],
   }),
   component: AiTrainerPage,
 });

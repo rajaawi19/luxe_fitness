@@ -5,7 +5,7 @@ import { createCheckoutSession, type PlanName } from "@/server/stripe";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { trackEvent } from "@/lib/track";
-import { canonical } from "@/lib/seo";
+import { canonical, organizationJsonLd, webpageJsonLd, jsonLdScript } from "@/lib/seo";
 
 export const Route = createFileRoute("/membership")({
   head: () => ({
@@ -21,6 +21,14 @@ export const Route = createFileRoute("/membership")({
       { name: "twitter:description", content: "Three tiers of luxury AI fitness — pick the plan that fits your lifestyle." },
     ],
     links: [{ rel: "canonical", href: canonical("/membership") }],
+    scripts: [
+      jsonLdScript(organizationJsonLd()),
+      jsonLdScript(webpageJsonLd({
+        name: "Membership — Basic, Premium & Elite Plans at RKDF Gym",
+        description: "Choose Basic, Premium, or Elite membership at RKDF — luxury AI fitness curated for your lifestyle.",
+        path: "/membership",
+      })),
+    ],
   }),
   component: MembershipPage,
 });
