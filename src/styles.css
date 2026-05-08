@@ -6,6 +6,7 @@
 
 @theme inline {
   --font-display: "Cormorant Garamond", "Playfair Display", serif;
+  --font-editorial: "Bodoni Moda", "Didot", "Bodoni 72", "Cormorant Garamond", serif;
   --font-sans: "Inter", system-ui, sans-serif;
 
   --radius-sm: calc(var(--radius) - 4px);
@@ -129,6 +130,7 @@
 
 @layer utilities {
   .font-display { font-family: var(--font-display); }
+  .font-editorial { font-family: var(--font-editorial); font-feature-settings: "liga", "dlig", "swsh"; }
   .text-gradient-gold {
     background: var(--gradient-gold);
     -webkit-background-clip: text;
