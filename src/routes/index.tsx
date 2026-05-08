@@ -53,28 +53,34 @@ function HomePage() {
         </div>
 
         <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-4xl">
-            <div className="animate-fade-up flex items-center gap-3 mb-10">
-              <div className="h-px w-12 bg-gradient-gold" />
-              <span className="text-[10px] uppercase tracking-[0.5em] text-gradient-gold">
+          <div className="max-w-5xl">
+            <div className="animate-fade-up flex items-center gap-4 mb-8">
+              <div className="h-px w-16 bg-gradient-gold" />
+              <span className="text-[10px] uppercase tracking-[0.6em] text-gradient-gold font-semibold">
                 The Future of Fitness
               </span>
-              <div className="h-px w-12 bg-gradient-gold/40" />
             </div>
 
-            <h1 className="animate-fade-up delay-100 mb-10 [text-wrap:balance] drop-shadow-[0_4px_30px_rgba(0,0,0,0.65)]">
-              <span className="block font-editorial font-light text-foreground/95 text-[3.5rem] sm:text-7xl md:text-8xl lg:text-[8.5rem] leading-[0.88] tracking-[-0.04em]">
+            <h1 className="animate-fade-up delay-100 mb-10 [text-wrap:balance]">
+              {/* Line 1 — outlined ELEVATE */}
+              <span className="block font-editorial uppercase text-stroke-gold text-[3.5rem] sm:text-7xl md:text-8xl lg:text-[10rem] leading-[0.85] tracking-[-0.04em] font-black">
                 Elevate
               </span>
-              <span className="block pl-[0.6em] -mt-2 font-editorial font-extralight italic text-gradient-gold text-[3.75rem] sm:text-7xl md:text-8xl lg:text-[9rem] leading-[0.88] tracking-[-0.045em]">
+
+              {/* Line 2 — massive italic gold "your fitness" */}
+              <span
+                className="block font-editorial italic text-gradient-gold text-[4.25rem] sm:text-[5.5rem] md:text-[7.5rem] lg:text-[11rem] leading-[0.82] tracking-[-0.05em] -mt-2 sm:-mt-4"
+                style={{ fontWeight: 900, fontVariationSettings: '"SOFT" 80, "opsz" 144' }}
+              >
                 your fitness
               </span>
-              <span className="mt-6 flex items-center gap-4 pl-[0.4em]">
-                <span className="h-px flex-1 max-w-[60px] bg-gradient-to-r from-primary/80 to-transparent" />
-                <span className="font-sans font-light uppercase text-[0.7rem] sm:text-xs md:text-sm tracking-[0.45em] text-foreground/75 whitespace-nowrap">
-                  to a lifestyle of <span className="text-gradient-gold font-medium">distinction</span>
+
+              {/* Line 3 — refined sub-line */}
+              <span className="mt-8 flex items-center gap-4 max-w-2xl">
+                <span className="h-[2px] w-10 bg-gradient-gold flex-shrink-0" />
+                <span className="font-editorial text-foreground text-xl sm:text-2xl md:text-3xl lg:text-4xl leading-tight tracking-tight font-light">
+                  to a <span className="italic font-medium text-gradient-gold">lifestyle</span> of distinction.
                 </span>
-                <span className="h-px flex-1 max-w-[140px] bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
               </span>
             </h1>
             <p className="animate-fade-up delay-200 text-lg md:text-xl text-muted-foreground max-w-xl mb-12 leading-relaxed">
