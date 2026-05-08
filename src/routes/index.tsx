@@ -47,6 +47,9 @@ function HomePage() {
           />
           <div className="absolute inset-0 bg-gradient-hero" />
           <div className="absolute inset-0 bg-gradient-radial-gold opacity-50" />
+          {/* Stronger left-side veil so headline reads cleanly over imagery */}
+          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-background/10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
         </div>
 
         <div className="container mx-auto px-6 relative z-10">
@@ -57,10 +60,14 @@ function HomePage() {
                 The Future of Fitness
               </span>
             </div>
-            <h1 className="animate-fade-up delay-100 font-display text-5xl md:text-7xl lg:text-8xl leading-[0.95] mb-8">
-              Elevate your fitness
-              <br />
-              to a <span className="text-gradient-gold italic">lifestyle</span> of distinction.
+            <h1 className="animate-fade-up delay-100 font-display font-light text-[3.25rem] sm:text-6xl md:text-7xl lg:text-[7.5rem] leading-[0.92] tracking-[-0.03em] mb-8 [text-wrap:balance] drop-shadow-[0_4px_30px_rgba(0,0,0,0.6)]">
+              <span className="block text-foreground/95">Elevate your</span>
+              <span className="block">
+                <em className="not-italic font-display italic text-gradient-gold">fitness</em>
+              </span>
+              <span className="block text-foreground/85 text-[0.55em] sm:text-[0.5em] md:text-[0.45em] uppercase tracking-[0.35em] mt-4 font-sans font-light">
+                to a lifestyle of <span className="text-gradient-gold">distinction</span>
+              </span>
             </h1>
             <p className="animate-fade-up delay-200 text-lg md:text-xl text-muted-foreground max-w-xl mb-12 leading-relaxed">
               RKDF is the world's first luxury AI-powered fitness sanctuary —
