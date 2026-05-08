@@ -130,7 +130,15 @@
 
 @layer utilities {
   .font-display { font-family: var(--font-display); }
-  .font-editorial { font-family: var(--font-editorial); font-feature-settings: "liga", "dlig", "swsh"; }
+  .font-editorial {
+    font-family: var(--font-editorial);
+    font-feature-settings: "liga", "dlig", "ss01";
+    font-variation-settings: "SOFT" 50, "opsz" 144;
+  }
+  .text-stroke-gold {
+    -webkit-text-stroke: 1px oklch(0.74 0.13 80 / 70%);
+    color: transparent;
+  }
   .text-gradient-gold {
     background: var(--gradient-gold);
     -webkit-background-clip: text;
