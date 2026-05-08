@@ -3,7 +3,7 @@ import { ArrowRight, Sparkles, Activity, Dumbbell, Users, Award, Cpu } from "luc
 import heroImg from "@/assets/hero-gym.jpg";
 import aiImg from "@/assets/ai-trainer.jpg";
 import equipImg from "@/assets/equipment.jpg";
-import { canonical } from "@/lib/seo";
+import { canonical, organizationJsonLd, websiteJsonLd, webpageJsonLd, jsonLdScript } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,6 +19,15 @@ export const Route = createFileRoute("/")({
       { name: "twitter:description", content: "The world's first luxury AI-powered fitness sanctuary. Elite training, smart equipment, distinguished living." },
     ],
     links: [{ rel: "canonical", href: canonical("/") }],
+    scripts: [
+      jsonLdScript(organizationJsonLd()),
+      jsonLdScript(websiteJsonLd()),
+      jsonLdScript(webpageJsonLd({
+        name: "RKDF Gym — Elevate Your Fitness to a Lifestyle of Distinction",
+        description: "Elevate your fitness to a lifestyle of distinction. RKDF is the world's first luxury AI-powered fitness sanctuary.",
+        path: "/",
+      })),
+    ],
   }),
   component: HomePage,
 });

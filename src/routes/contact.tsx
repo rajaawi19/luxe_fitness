@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
-import { canonical } from "@/lib/seo";
+import { canonical, organizationJsonLd, webpageJsonLd, jsonLdScript } from "@/lib/seo";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -16,6 +16,14 @@ export const Route = createFileRoute("/contact")({
       { name: "twitter:description", content: "Tour the sanctuary, book a private consultation, or speak with our concierge." },
     ],
     links: [{ rel: "canonical", href: canonical("/contact") }],
+    scripts: [
+      jsonLdScript(organizationJsonLd()),
+      jsonLdScript(webpageJsonLd({
+        name: "Contact — Visit the RKDF Sanctuary in Mumbai",
+        description: "Visit RKDF in Mumbai or reach our concierge team for tours, private consultations, and membership inquiries.",
+        path: "/contact",
+      })),
+    ],
   }),
   component: ContactPage,
 });
