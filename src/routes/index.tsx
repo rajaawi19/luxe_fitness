@@ -53,20 +53,28 @@ function HomePage() {
         </div>
 
         <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-3xl">
-            <div className="animate-fade-up flex items-center gap-3 mb-8">
+          <div className="max-w-4xl">
+            <div className="animate-fade-up flex items-center gap-3 mb-10">
               <div className="h-px w-12 bg-gradient-gold" />
-              <span className="text-xs uppercase tracking-[0.4em] text-gradient-gold">
+              <span className="text-[10px] uppercase tracking-[0.5em] text-gradient-gold">
                 The Future of Fitness
               </span>
+              <div className="h-px w-12 bg-gradient-gold/40" />
             </div>
-            <h1 className="animate-fade-up delay-100 font-display font-light text-[3.25rem] sm:text-6xl md:text-7xl lg:text-[7.5rem] leading-[0.92] tracking-[-0.03em] mb-8 [text-wrap:balance] drop-shadow-[0_4px_30px_rgba(0,0,0,0.6)]">
-              <span className="block text-foreground/95">Elevate your</span>
-              <span className="block">
-                <em className="not-italic font-display italic text-gradient-gold">fitness</em>
+
+            <h1 className="animate-fade-up delay-100 mb-10 [text-wrap:balance] drop-shadow-[0_4px_30px_rgba(0,0,0,0.65)]">
+              <span className="block font-editorial font-light text-foreground/95 text-[3.5rem] sm:text-7xl md:text-8xl lg:text-[8.5rem] leading-[0.88] tracking-[-0.04em]">
+                Elevate
               </span>
-              <span className="block text-foreground/85 text-[0.55em] sm:text-[0.5em] md:text-[0.45em] uppercase tracking-[0.35em] mt-4 font-sans font-light">
-                to a lifestyle of <span className="text-gradient-gold">distinction</span>
+              <span className="block pl-[0.6em] -mt-2 font-editorial font-extralight italic text-gradient-gold text-[3.75rem] sm:text-7xl md:text-8xl lg:text-[9rem] leading-[0.88] tracking-[-0.045em]">
+                your fitness
+              </span>
+              <span className="mt-6 flex items-center gap-4 pl-[0.4em]">
+                <span className="h-px flex-1 max-w-[60px] bg-gradient-to-r from-primary/80 to-transparent" />
+                <span className="font-sans font-light uppercase text-[0.7rem] sm:text-xs md:text-sm tracking-[0.45em] text-foreground/75 whitespace-nowrap">
+                  to a lifestyle of <span className="text-gradient-gold font-medium">distinction</span>
+                </span>
+                <span className="h-px flex-1 max-w-[140px] bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
               </span>
             </h1>
             <p className="animate-fade-up delay-200 text-lg md:text-xl text-muted-foreground max-w-xl mb-12 leading-relaxed">
