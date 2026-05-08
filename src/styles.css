@@ -6,6 +6,7 @@
 
 @theme inline {
   --font-display: "Cormorant Garamond", "Playfair Display", serif;
+  --font-editorial: "Bodoni Moda", "Didot", "Bodoni 72", "Cormorant Garamond", serif;
   --font-sans: "Inter", system-ui, sans-serif;
 
   --radius-sm: calc(var(--radius) - 4px);
