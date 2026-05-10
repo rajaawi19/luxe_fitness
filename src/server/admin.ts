@@ -354,6 +354,10 @@ export const getFunnelAnalytics = createServerFn({ method: "POST" })
     const planViews: Record<string, number> = {};
     const planCheckouts: Record<string, number> = {};
     const planConversions: Record<string, number> = {};
+    const ctaClicks: Record<string, number> = {};
+    const ctaSessions: Record<string, Set<string>> = {};
+    const checkoutSessions = new Set<string>();
+    const completedSessions = new Set<string>();
 
     for (const e of events ?? []) {
       if (e.session_id) sessions.add(e.session_id);
@@ -362,7 +366,35 @@ export const getFunnelAnalytics = createServerFn({ method: "POST" })
       if (e.event === "plan_viewed" && props.plan) planViews[props.plan] = (planViews[props.plan] ?? 0) + 1;
       if (e.event === "checkout_started" && props.plan) planCheckouts[props.plan] = (planCheckouts[props.plan] ?? 0) + 1;
       if (e.event === "checkout_completed" && props.plan) planConversions[props.plan] = (planConversions[props.plan] ?? 0) + 1;
+      if (e.event === "checkout_started" && e.session_id) checkoutSessions.add(e.session_id);
+      if (e.event === "checkout_completed" && e.session_id) completedSessions.add(e.session_id);
+      if (e.event === "cta_click") {
+        const key = `${props.location ?? "unknown"}:${props.cta ?? "unknown"}`;
+        ctaClicks[key] = (ctaClicks[key] ?? 0) + 1;
+        if (e.session_id) {
+          if (!ctaSessions[key]) ctaSessions[key] = new Set();
+          ctaSessions[key].add(e.session_id);
+        }
+      }
     }
+
+    const ctaFunnel = Object.keys(ctaClicks).map((key) => {
+      const sess = ctaSessions[key] ?? new Set<string>();
+      let toCheckout = 0;
+      let toCompleted = 0;
+      sess.forEach((s) => {
+        if (checkoutSessions.has(s)) toCheckout++;
+        if (completedSessions.has(s)) toCompleted++;
+      });
+      return {
+        cta: key,
+        clicks: ctaClicks[key],
+        uniqueSessions: sess.size,
+        reachedCheckout: toCheckout,
+        completed: toCompleted,
+        conversion: sess.size ? toCompleted / sess.size : 0,
+      };
+    }).sort((a, b) => b.clicks - a.clicks);
 
     const plans = Array.from(new Set([...Object.keys(planViews), ...Object.keys(planCheckouts), ...Object.keys(planConversions)]));
     const planFunnel = plans.map((plan) => {
