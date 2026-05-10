@@ -4,6 +4,7 @@ import heroImg from "@/assets/hero-gym.jpg";
 import aiImg from "@/assets/ai-trainer.jpg";
 import equipImg from "@/assets/equipment.jpg";
 import { canonical, organizationJsonLd, websiteJsonLd, webpageJsonLd, jsonLdScript } from "@/lib/seo";
+import { trackEvent } from "@/lib/track";
 
 export const Route = createFileRoute("/")({
   head: () => ({
