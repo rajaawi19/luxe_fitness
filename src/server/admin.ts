@@ -417,6 +417,7 @@ export const getFunnelAnalytics = createServerFn({ method: "POST" })
       totalEvents: events?.length ?? 0,
       eventCounts,
       planFunnel,
+      ctaFunnel,
     };
   });
 
