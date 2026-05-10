@@ -482,6 +482,45 @@ function AdminPage() {
           </Card>
         </div>
 
+        {/* CTA Click-Through & Conversion */}
+        <Card className="mb-10">
+          <CardHeader title="CTA Click-Through & Conversions (30d)" icon={<Activity className="h-5 w-5" />} />
+          <div className="px-6 pb-6">
+            {funnel && (funnel as any).ctaFunnel && (funnel as any).ctaFunnel.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="text-xs uppercase tracking-wider text-muted-foreground border-b border-border">
+                    <tr>
+                      <th className="text-left py-2">CTA</th>
+                      <th className="text-right py-2">Clicks</th>
+                      <th className="text-right py-2">Sessions</th>
+                      <th className="text-right py-2">→ Checkout</th>
+                      <th className="text-right py-2">→ Paid</th>
+                      <th className="text-right py-2">Conv.</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(funnel as any).ctaFunnel.map((c: any) => (
+                      <tr key={c.cta} className="border-b border-border/40">
+                        <td className="py-2 font-mono text-xs">{c.cta}</td>
+                        <td className="py-2 text-right font-display">{c.clicks}</td>
+                        <td className="py-2 text-right">{c.uniqueSessions}</td>
+                        <td className="py-2 text-right">{c.reachedCheckout}</td>
+                        <td className="py-2 text-right">{c.completed}</td>
+                        <td className="py-2 text-right text-gradient-gold font-medium">{pct(c.conversion)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-muted-foreground text-sm">
+                No CTA clicks yet. Click the hero buttons on the homepage to start populating this report.
+              </div>
+            )}
+          </div>
+        </Card>
+
         {/* User Accounts */}
         <Card className="mb-10">
           <CardHeader
