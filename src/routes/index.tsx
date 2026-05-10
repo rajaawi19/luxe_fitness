@@ -53,16 +53,6 @@ function HomePage() {
 
         <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-3xl relative">
-            {/* Darkness backdrop behind headline for legibility */}
-            <div
-              aria-hidden
-              className="absolute -inset-x-6 -inset-y-8 sm:-inset-10 -z-10 rounded-[2rem] bg-gradient-to-br from-background/85 via-background/65 to-background/30 backdrop-blur-[2px]"
-            />
-            <div
-              aria-hidden
-              className="absolute -inset-x-6 -inset-y-8 sm:-inset-10 -z-10 rounded-[2rem] shadow-[inset_0_0_80px_30px_hsl(var(--background)/0.6)]"
-            />
-
             <div className="animate-fade-up flex items-center gap-4 mb-8">
               <div className="h-px w-16 bg-gradient-gold" />
               <span className="text-xs uppercase tracking-[0.4em] text-gradient-gold font-semibold">
