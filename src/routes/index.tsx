@@ -52,7 +52,17 @@ function HomePage() {
         </div>
 
         <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-3xl">
+          <div className="max-w-3xl relative">
+            {/* Darkness backdrop behind headline for legibility */}
+            <div
+              aria-hidden
+              className="absolute -inset-x-6 -inset-y-8 sm:-inset-10 -z-10 rounded-[2rem] bg-gradient-to-br from-background/85 via-background/65 to-background/30 backdrop-blur-[2px]"
+            />
+            <div
+              aria-hidden
+              className="absolute -inset-x-6 -inset-y-8 sm:-inset-10 -z-10 rounded-[2rem] shadow-[inset_0_0_80px_30px_hsl(var(--background)/0.6)]"
+            />
+
             <div className="animate-fade-up flex items-center gap-4 mb-8">
               <div className="h-px w-16 bg-gradient-gold" />
               <span className="text-xs uppercase tracking-[0.4em] text-gradient-gold font-semibold">
@@ -60,7 +70,7 @@ function HomePage() {
               </span>
             </div>
 
-            <h1 className="animate-fade-up delay-100 font-display text-5xl md:text-7xl lg:text-8xl leading-[1.05] mb-8 [text-wrap:balance]">
+            <h1 className="animate-fade-up delay-100 font-display text-5xl md:text-7xl lg:text-8xl leading-[1.05] mb-8 [text-wrap:balance] drop-shadow-[0_2px_20px_rgba(0,0,0,0.55)]">
               Elevate your <em className="text-gradient-gold not-italic">fitness</em> to a lifestyle of <span className="text-gradient-gold">distinction</span>.
             </h1>
             <p className="animate-fade-up delay-200 text-lg md:text-xl text-muted-foreground max-w-xl mb-12 leading-relaxed">
@@ -71,6 +81,7 @@ function HomePage() {
             <div className="animate-fade-up delay-300 flex flex-col sm:flex-row gap-4">
               <Link
                 to="/ai-trainer"
+                onClick={() => trackEvent("cta_click", { cta: "start_workout", location: "hero", destination: "/ai-trainer" })}
                 className="group relative inline-flex items-center justify-center gap-3 px-10 py-5 rounded-full bg-gradient-gold text-primary-foreground text-xs font-semibold uppercase tracking-[0.25em] shadow-gold-lg hover:shadow-gold-lg hover:scale-[1.04] hover:-translate-y-0.5 transition-all duration-500 ease-luxury overflow-hidden"
               >
                 <span className="absolute inset-0 shimmer opacity-0 group-hover:opacity-60 transition-opacity duration-500" />
@@ -80,6 +91,7 @@ function HomePage() {
               </Link>
               <Link
                 to="/membership"
+                onClick={() => trackEvent("cta_click", { cta: "view_plans", location: "hero", destination: "/membership" })}
                 className="group relative inline-flex items-center justify-center gap-3 px-10 py-5 rounded-full glass gold-border text-xs font-semibold uppercase tracking-[0.25em] hover:bg-accent/40 hover:scale-[1.04] hover:-translate-y-0.5 transition-all duration-500 ease-luxury overflow-hidden"
               >
                 <span className="absolute inset-0 bg-gradient-gold opacity-0 group-hover:opacity-10 transition-opacity duration-500" />
