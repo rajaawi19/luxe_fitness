@@ -47,41 +47,20 @@ function HomePage() {
           />
           <div className="absolute inset-0 bg-gradient-hero" />
           <div className="absolute inset-0 bg-gradient-radial-gold opacity-50" />
-          {/* Stronger left-side veil so headline reads cleanly over imagery */}
-          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-background/10" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
         </div>
 
         <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-5xl">
+          <div className="max-w-3xl">
             <div className="animate-fade-up flex items-center gap-4 mb-8">
               <div className="h-px w-16 bg-gradient-gold" />
-              <span className="text-[10px] uppercase tracking-[0.6em] text-gradient-gold font-semibold">
+              <span className="text-xs uppercase tracking-[0.4em] text-gradient-gold font-semibold">
                 The Future of Fitness
               </span>
             </div>
 
-            <h1 className="animate-fade-up delay-100 mb-10 [text-wrap:balance]">
-              {/* Line 1 — outlined ELEVATE */}
-              <span className="block font-editorial uppercase text-stroke-gold text-[3.5rem] sm:text-7xl md:text-8xl lg:text-[10rem] leading-[0.85] tracking-[-0.04em] font-black">
-                Elevate
-              </span>
-
-              {/* Line 2 — massive italic gold "your fitness" */}
-              <span
-                className="block font-editorial italic text-gradient-gold text-[4.25rem] sm:text-[5.5rem] md:text-[7.5rem] lg:text-[11rem] leading-[0.82] tracking-[-0.05em] -mt-2 sm:-mt-4"
-                style={{ fontWeight: 900, fontVariationSettings: '"SOFT" 80, "opsz" 144' }}
-              >
-                your fitness
-              </span>
-
-              {/* Line 3 — refined sub-line */}
-              <span className="mt-8 flex items-center gap-4 max-w-2xl">
-                <span className="h-[2px] w-10 bg-gradient-gold flex-shrink-0" />
-                <span className="font-editorial text-foreground text-xl sm:text-2xl md:text-3xl lg:text-4xl leading-tight tracking-tight font-light">
-                  to a <span className="italic font-medium text-gradient-gold">lifestyle</span> of distinction.
-                </span>
-              </span>
+            <h1 className="animate-fade-up delay-100 font-display text-5xl md:text-7xl lg:text-8xl leading-[1.05] mb-8 [text-wrap:balance]">
+              Elevate your <em className="text-gradient-gold not-italic">fitness</em> to a lifestyle of <span className="text-gradient-gold">distinction</span>.
             </h1>
             <p className="animate-fade-up delay-200 text-lg md:text-xl text-muted-foreground max-w-xl mb-12 leading-relaxed">
               RKDF is the world's first luxury AI-powered fitness sanctuary —
@@ -90,19 +69,21 @@ function HomePage() {
             </p>
             <div className="animate-fade-up delay-300 flex flex-col sm:flex-row gap-4">
               <Link
-                to="/membership"
-                className="group relative inline-flex items-center justify-center gap-3 px-10 py-5 rounded-full bg-gradient-gold text-primary-foreground text-xs font-semibold uppercase tracking-[0.25em] shadow-gold-lg hover:scale-[1.03] transition-all duration-500 ease-luxury overflow-hidden"
+                to="/ai-trainer"
+                className="group relative inline-flex items-center justify-center gap-3 px-10 py-5 rounded-full bg-gradient-gold text-primary-foreground text-xs font-semibold uppercase tracking-[0.25em] shadow-gold-lg hover:shadow-gold-lg hover:scale-[1.04] hover:-translate-y-0.5 transition-all duration-500 ease-luxury overflow-hidden"
               >
-                <span className="relative z-10">Begin Your Journey</span>
-                <ArrowRight className="relative z-10 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                <div className="absolute inset-0 shimmer opacity-50" />
+                <span className="absolute inset-0 shimmer opacity-0 group-hover:opacity-60 transition-opacity duration-500" />
+                <Sparkles className="relative z-10 h-4 w-4 group-hover:rotate-12 transition-transform duration-500 ease-luxury" />
+                <span className="relative z-10">Start Workout</span>
+                <ArrowRight className="relative z-10 h-4 w-4 -ml-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 ease-luxury" />
               </Link>
               <Link
-                to="/ai-trainer"
-                className="inline-flex items-center justify-center gap-3 px-10 py-5 rounded-full glass gold-border text-xs font-semibold uppercase tracking-[0.25em] hover:bg-accent/40 transition-all duration-500 ease-luxury"
+                to="/membership"
+                className="group relative inline-flex items-center justify-center gap-3 px-10 py-5 rounded-full glass gold-border text-xs font-semibold uppercase tracking-[0.25em] hover:bg-accent/40 hover:scale-[1.04] hover:-translate-y-0.5 transition-all duration-500 ease-luxury overflow-hidden"
               >
-                <Sparkles className="h-4 w-4" />
-                Meet the AI Trainer
+                <span className="absolute inset-0 bg-gradient-gold opacity-0 group-hover:opacity-10 transition-opacity duration-500" />
+                <span className="relative z-10">View Plans</span>
+                <ArrowRight className="relative z-10 h-4 w-4 group-hover:translate-x-1 transition-transform duration-500 ease-luxury" />
               </Link>
             </div>
 
