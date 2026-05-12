@@ -19,6 +19,7 @@ import {
   FileText,
   Flame,
   Heart,
+  KeyRound,
   Loader2,
   LogOut,
   Medal,
