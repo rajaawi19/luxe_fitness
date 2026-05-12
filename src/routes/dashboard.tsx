@@ -659,7 +659,14 @@ function DashboardPage() {
             </div>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
 
+function KeyIcon() {
+  return <KeyRoundIcon className="h-5 w-5 text-primary" />;
+}
 
 function Stat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
@@ -703,12 +710,3 @@ function ProgressRing({ pct, label, sub }: { pct: number; label: string; sub: st
   );
 }
 
-function formatAmount(amount: number | null, currency: string | null) {
-  if (amount == null) return "—";
-  const cur = (currency ?? "usd").toUpperCase();
-  try {
-    return new Intl.NumberFormat(undefined, { style: "currency", currency: cur }).format(amount / 100);
-  } catch {
-    return `${(amount / 100).toFixed(2)} ${cur}`;
-  }
-}
