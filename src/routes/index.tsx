@@ -60,9 +60,19 @@ function HomePage() {
               </span>
             </div>
 
-            <h1 className="animate-fade-up delay-100 font-display text-5xl md:text-7xl lg:text-8xl leading-[1.05] mb-8 [text-wrap:balance] drop-shadow-[0_2px_20px_rgba(0,0,0,0.55)]">
-              Elevate your <em className="text-gradient-gold not-italic">fitness</em> to a lifestyle of <span className="text-gradient-gold">distinction</span>.
-            </h1>
+            <div className="animate-fade-up delay-100 relative inline-block mb-8 max-w-full">
+              <div
+                aria-hidden
+                className="absolute -inset-x-6 -inset-y-5 md:-inset-x-10 md:-inset-y-7 rounded-3xl glass gold-border shadow-gold"
+              />
+              <div
+                aria-hidden
+                className="absolute -inset-x-6 -inset-y-5 md:-inset-x-10 md:-inset-y-7 rounded-3xl bg-gradient-radial-gold opacity-70 pointer-events-none"
+              />
+              <h1 className="relative font-display text-5xl md:text-7xl lg:text-8xl leading-[1.05] [text-wrap:balance] drop-shadow-[0_2px_24px_rgba(0,0,0,0.65)]">
+                Elevate your <em className="text-gradient-gold not-italic">fitness</em> to a lifestyle of <span className="text-gradient-gold">distinction</span>.
+              </h1>
+            </div>
             <p className="animate-fade-up delay-200 text-lg md:text-xl text-muted-foreground max-w-xl mb-12 leading-relaxed">
               RKDF is the world's first luxury AI-powered fitness sanctuary —
               an ecosystem where elite training, smart equipment, and personalized
