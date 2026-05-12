@@ -51,8 +51,8 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 type Membership = Awaited<ReturnType<typeof getMembershipStatus>>;
-type InvoicesResult = Awaited<ReturnType<typeof listInvoices>>;
-type Invoice = InvoicesResult["invoices"][number];
+type ActivationCodes = Awaited<ReturnType<typeof listMyActivationCodes>>;
+type ActivationCode = ActivationCodes["codes"][number];
 
 function DashboardPage() {
   const navigate = useNavigate();
@@ -60,11 +60,10 @@ function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [membership, setMembership] = useState<Membership | null>(null);
   const [membershipLoading, setMembershipLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState<"portal" | "cancel" | "resume" | null>(null);
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [invoicesLoading, setInvoicesLoading] = useState(true);
-  const [invoiceSearch, setInvoiceSearch] = useState("");
-  const [invoiceStatus, setInvoiceStatus] = useState<"all" | "paid" | "open" | "void" | "uncollectible" | "draft">("all");
+  const [codes, setCodes] = useState<ActivationCode[]>([]);
+  const [codesLoading, setCodesLoading] = useState(true);
+  const [redeemValue, setRedeemValue] = useState("");
+  const [redeeming, setRedeeming] = useState(false);
   const [water, setWater] = useState(5); // glasses out of 8
   const [goals, setGoals] = useState([
     { id: 1, label: "Train 5x this week", done: 3, total: 5 },
@@ -73,25 +72,6 @@ function DashboardPage() {
     { id: 4, label: "Drink 2L water", done: 6, total: 7 },
   ]);
 
-  const filteredInvoices = useMemo(() => {
-    const q = invoiceSearch.trim().toLowerCase();
-    return invoices.filter((inv) => {
-      if (invoiceStatus !== "all" && inv.status !== invoiceStatus) return false;
-      if (!q) return true;
-      const hay = [inv.number, inv.id, inv.status, String(inv.amountPaid ?? ""), String(inv.amountDue ?? "")]
-        .filter(Boolean).join(" ").toLowerCase();
-      return hay.includes(q);
-    });
-  }, [invoices, invoiceSearch, invoiceStatus]);
-
-  const statusCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: invoices.length };
-    for (const inv of invoices) {
-      const s = inv.status ?? "unknown";
-      counts[s] = (counts[s] ?? 0) + 1;
-    }
-    return counts;
-  }, [invoices]);
 
   const loadMembership = useCallback(async () => {
     setMembershipLoading(true);
