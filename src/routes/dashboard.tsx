@@ -666,7 +666,7 @@ function DashboardPage() {
 }
 
 function KeyIcon() {
-  return <KeyRoundIcon className="h-5 w-5 text-primary" />;
+  return <KeyRound className="h-5 w-5 text-primary" />;
 }
 
 function Stat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
