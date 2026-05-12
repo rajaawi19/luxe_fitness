@@ -19,6 +19,7 @@ import {
   FileText,
   Flame,
   Heart,
+  KeyRound,
   Loader2,
   LogOut,
   Medal,
@@ -36,13 +37,8 @@ import {
   XCircle,
   Zap,
 } from "lucide-react";
-import {
-  cancelSubscription,
-  createPortalSession,
-  getMembershipStatus,
-  listInvoices,
-  resumeSubscription,
-} from "@/server/stripe";
+import { getMembershipStatus } from "@/server/stripe";
+import { listMyActivationCodes, redeemActivationCode } from "@/server/payments";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -56,8 +52,8 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 type Membership = Awaited<ReturnType<typeof getMembershipStatus>>;
-type InvoicesResult = Awaited<ReturnType<typeof listInvoices>>;
-type Invoice = InvoicesResult["invoices"][number];
+type ActivationCodes = Awaited<ReturnType<typeof listMyActivationCodes>>;
+type ActivationCode = ActivationCodes["codes"][number];
 
 function DashboardPage() {
   const navigate = useNavigate();
@@ -65,11 +61,10 @@ function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [membership, setMembership] = useState<Membership | null>(null);
   const [membershipLoading, setMembershipLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState<"portal" | "cancel" | "resume" | null>(null);
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [invoicesLoading, setInvoicesLoading] = useState(true);
-  const [invoiceSearch, setInvoiceSearch] = useState("");
-  const [invoiceStatus, setInvoiceStatus] = useState<"all" | "paid" | "open" | "void" | "uncollectible" | "draft">("all");
+  const [codes, setCodes] = useState<ActivationCode[]>([]);
+  const [codesLoading, setCodesLoading] = useState(true);
+  const [redeemValue, setRedeemValue] = useState("");
+  const [redeeming, setRedeeming] = useState(false);
   const [water, setWater] = useState(5); // glasses out of 8
   const [goals, setGoals] = useState([
     { id: 1, label: "Train 5x this week", done: 3, total: 5 },
@@ -78,25 +73,6 @@ function DashboardPage() {
     { id: 4, label: "Drink 2L water", done: 6, total: 7 },
   ]);
 
-  const filteredInvoices = useMemo(() => {
-    const q = invoiceSearch.trim().toLowerCase();
-    return invoices.filter((inv) => {
-      if (invoiceStatus !== "all" && inv.status !== invoiceStatus) return false;
-      if (!q) return true;
-      const hay = [inv.number, inv.id, inv.status, String(inv.amountPaid ?? ""), String(inv.amountDue ?? "")]
-        .filter(Boolean).join(" ").toLowerCase();
-      return hay.includes(q);
-    });
-  }, [invoices, invoiceSearch, invoiceStatus]);
-
-  const statusCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: invoices.length };
-    for (const inv of invoices) {
-      const s = inv.status ?? "unknown";
-      counts[s] = (counts[s] ?? 0) + 1;
-    }
-    return counts;
-  }, [invoices]);
 
   const loadMembership = useCallback(async () => {
     setMembershipLoading(true);
@@ -114,19 +90,19 @@ function DashboardPage() {
     }
   }, []);
 
-  const loadInvoices = useCallback(async () => {
-    setInvoicesLoading(true);
+  const loadCodes = useCallback(async () => {
+    setCodesLoading(true);
     try {
       const { data: sess } = await supabase.auth.getSession();
       if (!sess.session) return;
-      const result = await listInvoices({
+      const result = await listMyActivationCodes({
         headers: { Authorization: `Bearer ${sess.session.access_token}` },
       } as any);
-      setInvoices(result.invoices);
+      setCodes(result.codes);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to load invoices");
+      toast.error(err instanceof Error ? err.message : "Failed to load activation codes");
     } finally {
-      setInvoicesLoading(false);
+      setCodesLoading(false);
     }
   }, []);
 
@@ -141,11 +117,11 @@ function DashboardPage() {
       if (!data.session) navigate({ to: "/auth" });
       else {
         loadMembership();
-        loadInvoices();
+        loadCodes();
       }
     });
     return () => sub.subscription.unsubscribe();
-  }, [navigate, loadMembership, loadInvoices]);
+  }, [navigate, loadMembership, loadCodes]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -153,64 +129,24 @@ function DashboardPage() {
     navigate({ to: "/" });
   };
 
-  const withAuth = async <T,>(fn: (auth: string) => Promise<T>): Promise<T | null> => {
-    const { data: sess } = await supabase.auth.getSession();
-    if (!sess.session) return null;
-    return fn(`Bearer ${sess.session.access_token}`);
-  };
-
-  const openPortal = async () => {
-    setActionLoading("portal");
+  const redeem = async (codeOverride?: string) => {
+    const code = (codeOverride ?? redeemValue).trim().toUpperCase();
+    if (!code) return;
+    setRedeeming(true);
     try {
-      const result = await withAuth((auth) =>
-        createPortalSession({
-          data: { origin: window.location.origin },
-          headers: { Authorization: auth },
-        } as any),
-      );
-      if (result?.url) window.location.href = result.url;
+      const { data: sess } = await supabase.auth.getSession();
+      if (!sess.session) return;
+      const res = await redeemActivationCode({
+        data: { code },
+        headers: { Authorization: `Bearer ${sess.session.access_token}` },
+      } as any);
+      toast.success(`${res.plan} membership activated until ${new Date(res.expiresAt).toLocaleDateString()}`);
+      setRedeemValue("");
+      await Promise.all([loadMembership(), loadCodes()]);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not open billing portal");
-      setActionLoading(null);
-    }
-  };
-
-  const cancel = async () => {
-    if (!membership || !("subscriptionId" in membership) || !membership.subscriptionId) return;
-    if (!confirm("Cancel your membership at the end of the current period?")) return;
-    setActionLoading("cancel");
-    try {
-      await withAuth((auth) =>
-        cancelSubscription({
-          data: { subscriptionId: membership.subscriptionId! },
-          headers: { Authorization: auth },
-        } as any),
-      );
-      toast.success("Membership will end at the period close");
-      await loadMembership();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Cancel failed");
+      toast.error(err instanceof Error ? err.message : "Could not redeem code");
     } finally {
-      setActionLoading(null);
-    }
-  };
-
-  const resume = async () => {
-    if (!membership || !("subscriptionId" in membership) || !membership.subscriptionId) return;
-    setActionLoading("resume");
-    try {
-      await withAuth((auth) =>
-        resumeSubscription({
-          data: { subscriptionId: membership.subscriptionId! },
-          headers: { Authorization: auth },
-        } as any),
-      );
-      toast.success("Membership resumed");
-      await loadMembership();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Resume failed");
-    } finally {
-      setActionLoading(null);
+      setRedeeming(false);
     }
   };
 
@@ -219,6 +155,7 @@ function DashboardPage() {
       gs.map((g) => (g.id === id ? { ...g, done: Math.min(g.total, g.done + 1) } : g)),
     );
   };
+
 
   if (loading) {
     return <div className="min-h-[60vh] flex items-center justify-center text-muted-foreground">Loading…</div>;
@@ -623,7 +560,7 @@ function DashboardPage() {
             <div className="flex items-center gap-3 text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" /> Loading membership…
             </div>
-          ) : !membership || (!membership.active && !("subscriptionId" in membership && membership.subscriptionId)) ? (
+          ) : !membership || !membership.active ? (
             <div>
               <p className="text-muted-foreground mb-6">You don't have an active membership yet.</p>
               <Link
@@ -635,213 +572,101 @@ function DashboardPage() {
             </div>
           ) : (
             <>
-              <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
                 <Stat label="Tier" value={membership.plan ?? "—"} accent />
-                <Stat label="Status" value={membership.cancelAtPeriodEnd ? "Canceling" : (membership.status ?? "—")} />
+                <Stat label="Status" value={membership.status ?? "—"} />
                 <Stat
-                  label={membership.cancelAtPeriodEnd ? "Ends" : "Renews"}
+                  label="Valid until"
                   value={membership.currentPeriodEnd ? new Date(membership.currentPeriodEnd).toLocaleDateString() : "—"}
                 />
-                <Stat label="Auto-renew" value={membership.cancelAtPeriodEnd ? "Off" : "On"} />
               </div>
-
-              {membership.cancelAtPeriodEnd && (
-                <div className="mb-6 p-4 rounded-xl bg-destructive/10 border border-destructive/30 text-sm">
-                  Your membership will cancel on{" "}
-                  <strong>
-                    {membership.currentPeriodEnd ? new Date(membership.currentPeriodEnd).toLocaleDateString() : "the period end"}
-                  </strong>. You'll keep access until then.
-                </div>
-              )}
-
-              <div className="flex flex-wrap gap-3">
-                <button
-                  onClick={openPortal}
-                  disabled={actionLoading !== null}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-gold text-primary-foreground text-xs font-semibold uppercase tracking-[0.25em] shadow-gold disabled:opacity-60"
-                >
-                  {actionLoading === "portal" ? <Loader2 className="h-3 w-3 animate-spin" /> : <Settings className="h-3 w-3" />}
-                  Manage Billing
-                </button>
-
-                {membership.cancelAtPeriodEnd ? (
-                  <button
-                    onClick={resume}
-                    disabled={actionLoading !== null}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full glass gold-border text-xs font-semibold uppercase tracking-[0.25em] hover:bg-accent/40 disabled:opacity-60"
-                  >
-                    {actionLoading === "resume" && <Loader2 className="h-3 w-3 animate-spin" />}
-                    Resume Membership
-                  </button>
-                ) : (
-                  <button
-                    onClick={cancel}
-                    disabled={actionLoading !== null || !membership.active}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full glass border border-destructive/40 text-xs font-semibold uppercase tracking-[0.25em] text-destructive hover:bg-destructive/10 disabled:opacity-60"
-                  >
-                    {actionLoading === "cancel" ? <Loader2 className="h-3 w-3 animate-spin" /> : <XCircle className="h-3 w-3" />}
-                    Cancel Membership
-                  </button>
-                )}
-
-                <Link
-                  to="/membership"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full glass text-xs font-semibold uppercase tracking-[0.25em] hover:bg-accent/40"
-                >
-                  Change Plan
-                </Link>
-              </div>
+              <Link
+                to="/membership"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full glass gold-border text-xs font-semibold uppercase tracking-[0.25em] hover:bg-accent/40"
+              >
+                Renew / Upgrade
+              </Link>
             </>
           )}
         </div>
 
-        {/* Invoices / Receipts */}
+        {/* Redeem activation code */}
         <div className="p-8 md:p-10 rounded-3xl glass gold-border mb-10">
-          <div className="flex items-center justify-between flex-wrap gap-3 mb-6">
-            <div className="flex items-center gap-3">
-              <FileText className="h-5 w-5 text-primary" />
-              <h2 className="font-display text-3xl">Billing History</h2>
-            </div>
+          <div className="flex items-center gap-3 mb-3">
+            <KeyIcon />
+            <h2 className="font-display text-3xl">Redeem Activation Code</h2>
+          </div>
+          <p className="text-sm text-muted-foreground mb-6">
+            Paid via QR? Once admin verifies your payment, you'll see your activation code below — paste it here to unlock your membership.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 mb-6">
+            <input
+              type="text"
+              value={redeemValue}
+              onChange={(e) => setRedeemValue(e.target.value.toUpperCase())}
+              placeholder="RKDF-XXXX-XXXX-XXXX"
+              className="flex-1 px-4 py-3 rounded-full glass gold-border bg-transparent text-sm font-mono tracking-wider focus:outline-none focus:ring-1 focus:ring-primary/60"
+            />
             <button
-              onClick={loadInvoices}
-              disabled={invoicesLoading}
-              className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground hover:text-primary transition disabled:opacity-50"
+              onClick={() => redeem()}
+              disabled={redeeming || !redeemValue.trim()}
+              className="px-6 py-3 rounded-full bg-gradient-gold text-primary-foreground text-xs font-semibold uppercase tracking-[0.25em] shadow-gold disabled:opacity-60 inline-flex items-center justify-center gap-2"
             >
-              {invoicesLoading ? "Loading…" : "Refresh"}
+              {redeeming && <Loader2 className="h-3 w-3 animate-spin" />}
+              Redeem
             </button>
           </div>
 
-          {invoicesLoading ? (
-            <div className="flex items-center gap-3 text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" /> Loading invoices…
+          <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-3">Your codes</div>
+          {codesLoading ? (
+            <div className="flex items-center gap-3 text-muted-foreground text-sm">
+              <Loader2 className="h-4 w-4 animate-spin" /> Loading…
             </div>
-          ) : invoices.length === 0 ? (
-            <p className="text-muted-foreground">No invoices yet. Once you subscribe, your receipts will appear here.</p>
+          ) : codes.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No codes yet. After admin approves your payment, your activation code will appear here.
+            </p>
           ) : (
-            <>
-              <div className="flex flex-wrap items-center gap-3 mb-6">
-                <div className="relative flex-1 min-w-[220px]">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <input
-                    type="search"
-                    value={invoiceSearch}
-                    onChange={(e) => setInvoiceSearch(e.target.value)}
-                    placeholder="Search by invoice # or amount…"
-                    className="w-full pl-9 pr-3 py-2 rounded-full glass gold-border bg-transparent text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:ring-1 focus:ring-primary/60"
-                  />
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {(["all", "paid", "open", "void", "uncollectible", "draft"] as const).map((s) => {
-                    const count = statusCounts[s] ?? 0;
-                    if (s !== "all" && count === 0) return null;
-                    const active = invoiceStatus === s;
-                    return (
+            <div className="space-y-2">
+              {codes.map((c) => {
+                const expired = new Date(c.expires_at) < new Date();
+                const used = !!c.redeemed_at;
+                return (
+                  <div
+                    key={c.id}
+                    className="flex items-center gap-3 p-3 rounded-xl bg-background/40 border border-border/40"
+                  >
+                    <div className="flex-1">
+                      <div className="font-mono text-sm tracking-wider">{c.code}</div>
+                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">
+                        {c.plan} · {used ? `Redeemed ${new Date(c.redeemed_at!).toLocaleDateString()}` : expired ? "Expired" : `Expires ${new Date(c.expires_at).toLocaleDateString()}`}
+                      </div>
+                    </div>
+                    {!used && !expired && (
                       <button
-                        key={s}
-                        type="button"
-                        onClick={() => setInvoiceStatus(s)}
-                        className={`px-3 py-1.5 rounded-full text-[10px] uppercase tracking-[0.2em] transition ${
-                          active
-                            ? "bg-gradient-gold text-primary-foreground shadow-gold"
-                            : "glass gold-border text-muted-foreground hover:text-foreground"
-                        }`}
+                        onClick={() => redeem(c.code)}
+                        disabled={redeeming}
+                        className="px-4 py-1.5 rounded-full bg-gradient-gold text-primary-foreground text-[10px] uppercase tracking-[0.2em] shadow-gold disabled:opacity-60"
                       >
-                        {s} <span className="ml-1 opacity-70">{count}</span>
+                        Apply
                       </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {filteredInvoices.length === 0 ? (
-                <p className="text-muted-foreground">No invoices match your filters.</p>
-              ) : (
-                <div className="overflow-x-auto -mx-2">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-                        <th className="text-left font-normal py-3 px-2">Date</th>
-                        <th className="text-left font-normal py-3 px-2">Invoice</th>
-                        <th className="text-left font-normal py-3 px-2">Amount</th>
-                        <th className="text-left font-normal py-3 px-2">Status</th>
-                        <th className="text-right font-normal py-3 px-2">Receipt</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredInvoices.map((inv) => (
-                        <tr key={inv.id} className="border-t border-border/40">
-                          <td className="py-4 px-2 whitespace-nowrap">{new Date(inv.created).toLocaleDateString()}</td>
-                          <td className="py-4 px-2 font-mono text-xs text-muted-foreground">{inv.number ?? inv.id.slice(-8)}</td>
-                          <td className="py-4 px-2 whitespace-nowrap">{formatAmount(inv.amountPaid || inv.amountDue, inv.currency)}</td>
-                          <td className="py-4 px-2">
-                            <span
-                              className={`inline-flex px-2 py-1 rounded-full text-[10px] uppercase tracking-wider ${
-                                inv.status === "paid"
-                                  ? "bg-primary/10 text-primary"
-                                  : inv.status === "open"
-                                    ? "bg-yellow-500/10 text-yellow-500"
-                                    : "bg-muted text-muted-foreground"
-                              }`}
-                            >
-                              {inv.status ?? "—"}
-                            </span>
-                          </td>
-                          <td className="py-4 px-2">
-                            <div className="flex items-center justify-end gap-2">
-                              {inv.invoicePdf && (
-                                <a
-                                  href={inv.invoicePdf}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full glass gold-border text-[10px] uppercase tracking-[0.2em] hover:bg-accent/40"
-                                >
-                                  <Download className="h-3 w-3" /> PDF
-                                </a>
-                              )}
-                              {inv.hostedInvoiceUrl && (
-                                <a
-                                  href={inv.hostedInvoiceUrl}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full glass text-[10px] uppercase tracking-[0.2em] hover:bg-accent/40"
-                                >
-                                  <ExternalLink className="h-3 w-3" /> View
-                                </a>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-
-        {/* Refer a friend banner */}
-        <div className="p-8 rounded-3xl bg-gradient-gold text-primary-foreground relative overflow-hidden">
-          <div className="absolute -top-10 -right-10 h-40 w-40 bg-background/10 rounded-full" />
-          <div className="absolute -bottom-10 -left-10 h-32 w-32 bg-background/10 rounded-full" />
-          <div className="relative flex items-center justify-between flex-wrap gap-6">
-            <div className="flex items-center gap-4">
-              <div className="h-14 w-14 rounded-2xl bg-background/20 flex items-center justify-center">
-                <Share2 className="h-6 w-6" />
-              </div>
-              <div>
-                <div className="font-display text-2xl">Refer a friend, earn a free month</div>
-                <div className="text-sm opacity-80 mt-1">Share your link — both of you get 30 days on us.</div>
-              </div>
+                    )}
+                    {used && (
+                      <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                    )}
+                  </div>
+                );
+              })}
             </div>
-            <button className="px-6 py-3 rounded-full bg-background text-foreground text-xs font-semibold uppercase tracking-[0.25em] hover:bg-background/90 transition">
-              Get My Link
-            </button>
-          </div>
+          )}
         </div>
       </div>
     </div>
   );
+}
+
+function KeyIcon() {
+  return <KeyRound className="h-5 w-5 text-primary" />;
 }
 
 function Stat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
@@ -886,12 +711,3 @@ function ProgressRing({ pct, label, sub }: { pct: number; label: string; sub: st
   );
 }
 
-function formatAmount(amount: number | null, currency: string | null) {
-  if (amount == null) return "—";
-  const cur = (currency ?? "usd").toUpperCase();
-  try {
-    return new Intl.NumberFormat(undefined, { style: "currency", currency: cur }).format(amount / 100);
-  } catch {
-    return `${(amount / 100).toFixed(2)} ${cur}`;
-  }
-}
