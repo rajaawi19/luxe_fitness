@@ -89,19 +89,19 @@ function DashboardPage() {
     }
   }, []);
 
-  const loadInvoices = useCallback(async () => {
-    setInvoicesLoading(true);
+  const loadCodes = useCallback(async () => {
+    setCodesLoading(true);
     try {
       const { data: sess } = await supabase.auth.getSession();
       if (!sess.session) return;
-      const result = await listInvoices({
+      const result = await listMyActivationCodes({
         headers: { Authorization: `Bearer ${sess.session.access_token}` },
       } as any);
-      setInvoices(result.invoices);
+      setCodes(result.codes);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to load invoices");
+      toast.error(err instanceof Error ? err.message : "Failed to load activation codes");
     } finally {
-      setInvoicesLoading(false);
+      setCodesLoading(false);
     }
   }, []);
 
@@ -116,11 +116,11 @@ function DashboardPage() {
       if (!data.session) navigate({ to: "/auth" });
       else {
         loadMembership();
-        loadInvoices();
+        loadCodes();
       }
     });
     return () => sub.subscription.unsubscribe();
-  }, [navigate, loadMembership, loadInvoices]);
+  }, [navigate, loadMembership, loadCodes]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -128,64 +128,24 @@ function DashboardPage() {
     navigate({ to: "/" });
   };
 
-  const withAuth = async <T,>(fn: (auth: string) => Promise<T>): Promise<T | null> => {
-    const { data: sess } = await supabase.auth.getSession();
-    if (!sess.session) return null;
-    return fn(`Bearer ${sess.session.access_token}`);
-  };
-
-  const openPortal = async () => {
-    setActionLoading("portal");
+  const redeem = async (codeOverride?: string) => {
+    const code = (codeOverride ?? redeemValue).trim().toUpperCase();
+    if (!code) return;
+    setRedeeming(true);
     try {
-      const result = await withAuth((auth) =>
-        createPortalSession({
-          data: { origin: window.location.origin },
-          headers: { Authorization: auth },
-        } as any),
-      );
-      if (result?.url) window.location.href = result.url;
+      const { data: sess } = await supabase.auth.getSession();
+      if (!sess.session) return;
+      const res = await redeemActivationCode({
+        data: { code },
+        headers: { Authorization: `Bearer ${sess.session.access_token}` },
+      } as any);
+      toast.success(`${res.plan} membership activated until ${new Date(res.expiresAt).toLocaleDateString()}`);
+      setRedeemValue("");
+      await Promise.all([loadMembership(), loadCodes()]);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not open billing portal");
-      setActionLoading(null);
-    }
-  };
-
-  const cancel = async () => {
-    if (!membership || !("subscriptionId" in membership) || !membership.subscriptionId) return;
-    if (!confirm("Cancel your membership at the end of the current period?")) return;
-    setActionLoading("cancel");
-    try {
-      await withAuth((auth) =>
-        cancelSubscription({
-          data: { subscriptionId: membership.subscriptionId! },
-          headers: { Authorization: auth },
-        } as any),
-      );
-      toast.success("Membership will end at the period close");
-      await loadMembership();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Cancel failed");
+      toast.error(err instanceof Error ? err.message : "Could not redeem code");
     } finally {
-      setActionLoading(null);
-    }
-  };
-
-  const resume = async () => {
-    if (!membership || !("subscriptionId" in membership) || !membership.subscriptionId) return;
-    setActionLoading("resume");
-    try {
-      await withAuth((auth) =>
-        resumeSubscription({
-          data: { subscriptionId: membership.subscriptionId! },
-          headers: { Authorization: auth },
-        } as any),
-      );
-      toast.success("Membership resumed");
-      await loadMembership();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Resume failed");
-    } finally {
-      setActionLoading(null);
+      setRedeeming(false);
     }
   };
 
@@ -194,6 +154,7 @@ function DashboardPage() {
       gs.map((g) => (g.id === id ? { ...g, done: Math.min(g.total, g.done + 1) } : g)),
     );
   };
+
 
   if (loading) {
     return <div className="min-h-[60vh] flex items-center justify-center text-muted-foreground">Loading…</div>;
