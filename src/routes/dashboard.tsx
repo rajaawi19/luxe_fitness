@@ -36,13 +36,8 @@ import {
   XCircle,
   Zap,
 } from "lucide-react";
-import {
-  cancelSubscription,
-  createPortalSession,
-  getMembershipStatus,
-  listInvoices,
-  resumeSubscription,
-} from "@/server/stripe";
+import { getMembershipStatus } from "@/server/stripe";
+import { listMyActivationCodes, redeemActivationCode } from "@/server/payments";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
