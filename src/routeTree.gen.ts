@@ -18,6 +18,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AiTrainerRouteImport } from './routes/ai-trainer'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PayRequestIdRouteImport } from './routes/pay.$requestId'
 
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
   id: '/robots.txt',
@@ -64,6 +65,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PayRequestIdRoute = PayRequestIdRouteImport.update({
+  id: '/pay/$requestId',
+  path: '/pay/$requestId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/membership': typeof MembershipRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/pay/$requestId': typeof PayRequestIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/membership': typeof MembershipRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/pay/$requestId': typeof PayRequestIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/membership': typeof MembershipRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/pay/$requestId': typeof PayRequestIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/membership'
     | '/robots.txt'
+    | '/pay/$requestId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/membership'
     | '/robots.txt'
+    | '/pay/$requestId'
   id:
     | '__root__'
     | '/'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/membership'
     | '/robots.txt'
+    | '/pay/$requestId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -145,6 +157,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   MembershipRoute: typeof MembershipRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
+  PayRequestIdRoute: typeof PayRequestIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -212,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pay/$requestId': {
+      id: '/pay/$requestId'
+      path: '/pay/$requestId'
+      fullPath: '/pay/$requestId'
+      preLoaderRoute: typeof PayRequestIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -225,6 +245,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   MembershipRoute: MembershipRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
+  PayRequestIdRoute: PayRequestIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
