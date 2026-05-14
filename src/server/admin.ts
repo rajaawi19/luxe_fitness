@@ -284,7 +284,7 @@ export const compMembership = createServerFn({ method: "POST" })
 
     // Create a product first (Stripe requires product, not inline product_data, for sub items)
     const product = await stripe.products.create({
-      name: `RKDF ${data.planLabel} (Comp)`,
+      name: `FITBLISS ${data.planLabel} (Comp)`,
     });
 
     const sub = await stripe.subscriptions.create({

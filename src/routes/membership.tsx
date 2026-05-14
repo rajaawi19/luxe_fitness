@@ -11,22 +11,22 @@ import { canonical, organizationJsonLd, webpageJsonLd, jsonLdScript } from "@/li
 export const Route = createFileRoute("/membership")({
   head: () => ({
     meta: [
-      { title: "Membership — Basic, Premium & Elite Plans at RKDF Gym" },
-      { name: "description", content: "Choose Basic, Premium, or Elite membership at RKDF — luxury AI fitness curated for your lifestyle, with concierge access and personalized programming." },
-      { property: "og:title", content: "Membership — Basic, Premium & Elite Plans at RKDF Gym" },
+      { title: "Membership — Basic, Premium & Elite Plans at FITBLISS Gym" },
+      { name: "description", content: "Choose Basic, Premium, or Elite membership at FITBLISS — luxury AI fitness curated for your lifestyle, with concierge access and personalized programming." },
+      { property: "og:title", content: "Membership — Basic, Premium & Elite Plans at FITBLISS Gym" },
       { property: "og:description", content: "Three tiers of luxury AI fitness — pick the plan that fits your lifestyle." },
       { property: "og:type", content: "product" },
       { property: "og:url", content: canonical("/membership") },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Membership — Basic, Premium & Elite Plans at RKDF Gym" },
+      { name: "twitter:title", content: "Membership — Basic, Premium & Elite Plans at FITBLISS Gym" },
       { name: "twitter:description", content: "Three tiers of luxury AI fitness — pick the plan that fits your lifestyle." },
     ],
     links: [{ rel: "canonical", href: canonical("/membership") }],
     scripts: [
       jsonLdScript(organizationJsonLd()),
       jsonLdScript(webpageJsonLd({
-        name: "Membership — Basic, Premium & Elite Plans at RKDF Gym",
-        description: "Choose Basic, Premium, or Elite membership at RKDF — luxury AI fitness curated for your lifestyle.",
+        name: "Membership — Basic, Premium & Elite Plans at FITBLISS Gym",
+        description: "Choose Basic, Premium, or Elite membership at FITBLISS — luxury AI fitness curated for your lifestyle.",
         path: "/membership",
       })),
     ],
@@ -120,7 +120,7 @@ function MembershipPage() {
             Choose your <em className="text-gradient-gold not-italic">tier</em>.
           </h1>
           <p className="text-lg text-muted-foreground">
-            Every membership unlocks the RKDF ecosystem. The difference is how
+            Every membership unlocks the FITBLISS ecosystem. The difference is how
             personalized you want it.
           </p>
         </div>

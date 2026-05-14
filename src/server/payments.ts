@@ -45,8 +45,8 @@ async function requireAdmin() {
 }
 
 function buildUpiUri(opts: { amount: number; plan: PlanName; requestId: string }) {
-  const upiId = process.env.RKDF_UPI_ID || "merchant@upi";
-  const payeeName = process.env.RKDF_UPI_NAME || "RKDF Gym";
+  const upiId = process.env.FITBLISS_UPI_ID || "merchant@upi";
+  const payeeName = process.env.FITBLISS_UPI_NAME || "FITBLISS Gym";
   const note = `${opts.plan}-${opts.requestId.slice(0, 8)}`;
   const params = new URLSearchParams({
     pa: upiId,
@@ -62,7 +62,7 @@ function genCode() {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   const block = () =>
     Array.from({ length: 4 }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join("");
-  return `RKDF-${block()}-${block()}-${block()}`;
+  return `FITBLISS-${block()}-${block()}-${block()}`;
 }
 
 export const createPaymentRequest = createServerFn({ method: "POST" })
@@ -102,8 +102,8 @@ export const createPaymentRequest = createServerFn({ method: "POST" })
       status: row.status,
       createdAt: row.created_at,
       upi: buildUpiUri({ amount, plan: data.plan, requestId: row.id }),
-      payeeName: process.env.RKDF_UPI_NAME || "RKDF Gym",
-      upiId: process.env.RKDF_UPI_ID || "merchant@upi",
+      payeeName: process.env.FITBLISS_UPI_NAME || "FITBLISS Gym",
+      upiId: process.env.FITBLISS_UPI_ID || "merchant@upi",
     };
   });
 
@@ -128,8 +128,8 @@ export const getPaymentRequest = createServerFn({ method: "POST" })
       notes: row.notes,
       createdAt: row.created_at,
       upi: buildUpiUri({ amount: row.amount, plan: row.plan as PlanName, requestId: row.id }),
-      payeeName: process.env.RKDF_UPI_NAME || "RKDF Gym",
-      upiId: process.env.RKDF_UPI_ID || "merchant@upi",
+      payeeName: process.env.FITBLISS_UPI_NAME || "FITBLISS Gym",
+      upiId: process.env.FITBLISS_UPI_ID || "merchant@upi",
     };
   });
 

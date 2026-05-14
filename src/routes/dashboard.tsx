@@ -43,8 +43,8 @@ import { listMyActivationCodes, redeemActivationCode } from "@/server/payments";
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "Member Dashboard — RKDF Gym" },
-      { name: "description", content: "Your personal RKDF dashboard — membership, invoices, AI training insights, and concierge tools." },
+      { title: "Member Dashboard — FITBLISS Gym" },
+      { name: "description", content: "Your personal FITBLISS dashboard — membership, invoices, AI training insights, and concierge tools." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -604,7 +604,7 @@ function DashboardPage() {
               type="text"
               value={redeemValue}
               onChange={(e) => setRedeemValue(e.target.value.toUpperCase())}
-              placeholder="RKDF-XXXX-XXXX-XXXX"
+              placeholder="FITBLISS-XXXX-XXXX-XXXX"
               className="flex-1 px-4 py-3 rounded-full glass gold-border bg-transparent text-sm font-mono tracking-wider focus:outline-none focus:ring-1 focus:ring-primary/60"
             />
             <button

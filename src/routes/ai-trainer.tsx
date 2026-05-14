@@ -6,22 +6,22 @@ import { canonical, organizationJsonLd, webpageJsonLd, jsonLdScript } from "@/li
 export const Route = createFileRoute("/ai-trainer")({
   head: () => ({
     meta: [
-      { title: "AI Trainer — Adaptive Coaching at RKDF Gym" },
-      { name: "description", content: "Meet the RKDF AI Trainer — adaptive workouts, computer vision form correction, biometric sync, and predictive recovery." },
-      { property: "og:title", content: "AI Trainer — Adaptive Coaching at RKDF Gym" },
+      { title: "AI Trainer — Adaptive Coaching at FITBLISS Gym" },
+      { name: "description", content: "Meet the FITBLISS AI Trainer — adaptive workouts, computer vision form correction, biometric sync, and predictive recovery." },
+      { property: "og:title", content: "AI Trainer — Adaptive Coaching at FITBLISS Gym" },
       { property: "og:description", content: "An intelligent coach that learns you — adaptive programming, vision-based form, predictive recovery." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: canonical("/ai-trainer") },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "AI Trainer — Adaptive Coaching at RKDF Gym" },
+      { name: "twitter:title", content: "AI Trainer — Adaptive Coaching at FITBLISS Gym" },
       { name: "twitter:description", content: "An intelligent coach that learns you — adaptive programming, vision-based form, predictive recovery." },
     ],
     links: [{ rel: "canonical", href: canonical("/ai-trainer") }],
     scripts: [
       jsonLdScript(organizationJsonLd()),
       jsonLdScript(webpageJsonLd({
-        name: "AI Trainer — Adaptive Coaching at RKDF Gym",
-        description: "Meet the RKDF AI Trainer — adaptive workouts, computer vision form correction, biometric sync, and predictive recovery.",
+        name: "AI Trainer — Adaptive Coaching at FITBLISS Gym",
+        description: "Meet the FITBLISS AI Trainer — adaptive workouts, computer vision form correction, biometric sync, and predictive recovery.",
         path: "/ai-trainer",
       })),
     ],
@@ -49,7 +49,7 @@ function AiTrainerPage() {
               A coach built<br /> from your <em className="text-gradient-gold not-italic">data</em>.
             </h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              The RKDF AI Trainer is a neural model trained on millions of training
+              The FITBLISS AI Trainer is a neural model trained on millions of training
               sessions and tuned to your unique biology. It plans, observes,
               corrects, and adapts — every minute, every rep.
             </p>

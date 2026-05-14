@@ -49,7 +49,7 @@ Three new tables (all with RLS):
   - `id`, `user_id`, `plan` (Basic/Premium/Elite), `amount`, `utr` (txn ref entered by user), `status` (`pending` / `approved` / `rejected`), `created_at`, `reviewed_at`, `reviewed_by`, `notes`
 
 - **`activation_codes`** — generated on admin approval
-  - `id`, `code` (16-char unique, e.g. `RKDF-XXXX-XXXX-XXXX`), `payment_request_id`, `user_id`, `plan`, `expires_at`, `redeemed_at`, `created_at`
+  - `id`, `code` (16-char unique, e.g. `FITBLISS-XXXX-XXXX-XXXX`), `payment_request_id`, `user_id`, `plan`, `expires_at`, `redeemed_at`, `created_at`
 
 - **`memberships`** — active membership per user
   - `id`, `user_id`, `plan`, `activated_at`, `expires_at` (activation_at + 30 days), `activation_code_id`, `status` (`active` / `expired`)
@@ -65,7 +65,7 @@ RLS:
 2. **New `/pay/$requestId`** page:
    - Shows plan name + amount
    - Renders a QR code containing a UPI payment link:
-     `upi://pay?pa=<UPI_ID>&pn=RKDF%20Gym&am=<amount>&cu=INR&tn=<plan>-<requestId>`
+     `upi://pay?pa=<UPI_ID>&pn=FITBLISS%20Gym&am=<amount>&cu=INR&tn=<plan>-<requestId>`
    - Field to paste **UTR / transaction reference** + "I have paid" button → updates request, shows "Awaiting verification — you'll get an email with your activation code"
    - Uses `qrcode.react` (lightweight, no external API)
 
@@ -101,8 +101,8 @@ Use Lovable's built-in email infrastructure (no third-party key needed):
 
 ## Configuration needed from you
 
-- **UPI ID** to receive payments (e.g. `yourname@okicici`) — stored as a secret `RKDF_UPI_ID`
-- **Payee name** displayed on the QR (default: "RKDF Gym")
+- **UPI ID** to receive payments (e.g. `yourname@okicici`) — stored as a secret `FITBLISS_UPI_ID`
+- **Payee name** displayed on the QR (default: "FITBLISS Gym")
 - (Later, when setting up emails) approval to add the email domain and DNS records
 
 ## What gets removed / cleaned up
@@ -117,7 +117,7 @@ Use Lovable's built-in email infrastructure (no third-party key needed):
 - [ ] Frontend: rewired `/membership`, new `/pay/$requestId`, dashboard redeem card, admin pending payments panel
 - [ ] Email: domain setup + 2 templates wired into approve/reject actions
 - [ ] Remove Stripe code & secret
-- [ ] Add `RKDF_UPI_ID` secret (you provide the UPI ID)
+- [ ] Add `FITBLISS_UPI_ID` secret (you provide the UPI ID)
 
 ## Open question
 

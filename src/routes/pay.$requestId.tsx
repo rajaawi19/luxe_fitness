@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 export const Route = createFileRoute("/pay/$requestId")({
   head: () => ({
     meta: [
-      { title: "Complete Payment — RKDF Gym" },
+      { title: "Complete Payment — FITBLISS Gym" },
       { name: "description", content: "Scan the UPI QR code, pay, and submit your transaction reference." },
     ],
   }),

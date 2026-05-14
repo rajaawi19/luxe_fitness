@@ -9,8 +9,8 @@ export const canonical = (path: string) => {
   return `${SITE_URL.replace(/\/$/, "")}${clean === "/" ? "" : clean}`;
 };
 
-export const ORG_NAME = "RKDF Gym";
-export const ORG_LEGAL_NAME = "RKDF Gym";
+export const ORG_NAME = "FITBLISS Gym";
+export const ORG_LEGAL_NAME = "FITBLISS Gym";
 export const ORG_LOGO = `${SITE_URL.replace(/\/$/, "")}/favicon.ico`;
 export const ORG_SAMEAS: string[] = [];
 
