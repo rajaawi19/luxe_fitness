@@ -62,7 +62,19 @@ function PayPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-2xl py-12 px-4">
+    <div className="container mx-auto max-w-2xl py-12 px-4 space-y-6">
+      <div className="rounded-2xl border bg-card p-6">
+        <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Selected plan</div>
+        <div className="mt-2 flex items-baseline justify-between gap-4">
+          <h1 className="font-display text-3xl">{data.plan} membership</h1>
+          <div className="text-2xl font-semibold">₹{data.amount}<span className="text-sm text-muted-foreground font-normal"> / month</span></div>
+        </div>
+        <ol className="mt-4 space-y-1 text-sm text-muted-foreground list-decimal list-inside">
+          <li>Scan the QR below with any UPI app and pay the exact amount.</li>
+          <li>Copy the UTR (transaction reference) from your payment receipt.</li>
+          <li>Submit the UTR here — we'll email your activation code once an admin approves.</li>
+        </ol>
+      </div>
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between gap-4">
