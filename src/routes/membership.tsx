@@ -1,8 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Check, Loader2, Sparkles } from "lucide-react";
-import { createCheckoutSession, type PlanName } from "@/server/stripe";
+import { createPaymentRequest, type PlanName } from "@/server/payments";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { trackEvent } from "@/lib/track";
 import { canonical, organizationJsonLd, webpageJsonLd, jsonLdScript } from "@/lib/seo";
