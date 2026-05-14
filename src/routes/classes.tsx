@@ -5,21 +5,21 @@ import { canonical, organizationJsonLd, webpageJsonLd, jsonLdScript } from "@/li
 export const Route = createFileRoute("/classes")({
   head: () => ({
     meta: [
-      { title: "Classes — Curated Luxury Fitness at RKDF Gym" },
+      { title: "Classes — Curated Luxury Fitness at FITBLISS Gym" },
       { name: "description", content: "Curated luxury fitness classes — strength, mobility, breathwork, power yoga, boxing, and AI-led HIIT." },
-      { property: "og:title", content: "Classes — Curated Luxury Fitness at RKDF Gym" },
+      { property: "og:title", content: "Classes — Curated Luxury Fitness at FITBLISS Gym" },
       { property: "og:description", content: "Elite group classes for body and mind, led by world-class coaches and AI." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: canonical("/classes") },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Classes — Curated Luxury Fitness at RKDF Gym" },
+      { name: "twitter:title", content: "Classes — Curated Luxury Fitness at FITBLISS Gym" },
       { name: "twitter:description", content: "Elite group classes for body and mind, led by world-class coaches and AI." },
     ],
     links: [{ rel: "canonical", href: canonical("/classes") }],
     scripts: [
       jsonLdScript(organizationJsonLd()),
       jsonLdScript(webpageJsonLd({
-        name: "Classes — Curated Luxury Fitness at RKDF Gym",
+        name: "Classes — Curated Luxury Fitness at FITBLISS Gym",
         description: "Curated luxury fitness classes — strength, mobility, breathwork, power yoga, boxing, and AI-led HIIT.",
         path: "/classes",
       })),

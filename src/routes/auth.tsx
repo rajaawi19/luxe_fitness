@@ -7,8 +7,8 @@ import { Loader2 } from "lucide-react";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign In or Join — RKDF Gym Member Portal" },
-      { name: "description", content: "Access your RKDF member portal — sign in or create an account to manage your membership, classes, and AI training." },
+      { title: "Sign In or Join — FITBLISS Gym Member Portal" },
+      { name: "description", content: "Access your FITBLISS member portal — sign in or create an account to manage your membership, classes, and AI training." },
       { name: "robots", content: "noindex" },
     ],
     links: [{ rel: "canonical", href: "https://id-preview--b367f66d-dc3a-4eee-818a-a27521508023.lovable.app/auth" }],
@@ -44,7 +44,7 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Welcome to RKDF. Check your email to confirm.");
+        toast.success("Welcome to FITBLISS. Check your email to confirm.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -141,7 +141,7 @@ function AuthPage() {
           </form>
 
           <p className="text-center text-sm text-muted-foreground mt-6">
-            {mode === "signin" ? "New to RKDF?" : "Already a member?"}{" "}
+            {mode === "signin" ? "New to FITBLISS?" : "Already a member?"}{" "}
             <button
               onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
               className="text-primary hover:text-gold-bright underline-offset-4 hover:underline"

@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 
-const SESSION_KEY = "rkdf_session_id";
+const SESSION_KEY = "fitbliss_session_id";
 
 function getSessionId(): string {
   if (typeof window === "undefined") return "ssr";

@@ -9,14 +9,14 @@ import { trackEvent } from "@/lib/track";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "RKDF Gym — Elevate Your Fitness to a Lifestyle of Distinction" },
-      { name: "description", content: "Elevate your fitness to a lifestyle of distinction. RKDF is the world's first luxury AI-powered fitness sanctuary." },
-      { property: "og:title", content: "Elevate Your Fitness to a Lifestyle of Distinction — RKDF" },
+      { title: "FITBLISS Gym — Elevate Your Fitness to a Lifestyle of Distinction" },
+      { name: "description", content: "Elevate your fitness to a lifestyle of distinction. FITBLISS is the world's first luxury AI-powered fitness sanctuary." },
+      { property: "og:title", content: "Elevate Your Fitness to a Lifestyle of Distinction — FITBLISS" },
       { property: "og:description", content: "The world's first luxury AI-powered fitness sanctuary. Elite training, smart equipment, distinguished living." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: canonical("/") },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Elevate Your Fitness to a Lifestyle of Distinction — RKDF" },
+      { name: "twitter:title", content: "Elevate Your Fitness to a Lifestyle of Distinction — FITBLISS" },
       { name: "twitter:description", content: "The world's first luxury AI-powered fitness sanctuary. Elite training, smart equipment, distinguished living." },
     ],
     links: [{ rel: "canonical", href: canonical("/") }],
@@ -24,8 +24,8 @@ export const Route = createFileRoute("/")({
       jsonLdScript(organizationJsonLd()),
       jsonLdScript(websiteJsonLd()),
       jsonLdScript(webpageJsonLd({
-        name: "RKDF Gym — Elevate Your Fitness to a Lifestyle of Distinction",
-        description: "Elevate your fitness to a lifestyle of distinction. RKDF is the world's first luxury AI-powered fitness sanctuary.",
+        name: "FITBLISS Gym — Elevate Your Fitness to a Lifestyle of Distinction",
+        description: "Elevate your fitness to a lifestyle of distinction. FITBLISS is the world's first luxury AI-powered fitness sanctuary.",
         path: "/",
       })),
     ],
@@ -74,7 +74,7 @@ function HomePage() {
               </h1>
             </div>
             <p className="animate-fade-up delay-200 text-lg md:text-xl text-muted-foreground max-w-xl mb-12 leading-relaxed">
-              RKDF is the world's first luxury AI-powered fitness sanctuary —
+              FITBLISS is the world's first luxury AI-powered fitness sanctuary —
               an ecosystem where elite training, smart equipment, and personalized
               coaching converge.
             </p>
@@ -137,7 +137,7 @@ function HomePage() {
               { icon: Dumbbell, title: "Elite Training", desc: "Olympic coaches, biomechanics labs, and a sanctuary designed for performance and longevity." },
               { icon: Users, title: "Private Community", desc: "An invite-only network of athletes, founders, and creators who train together." },
               { icon: Award, title: "Lifestyle Concierge", desc: "Recovery suites, nutritionists, sleep specialists. Wellness, curated end to end." },
-              { icon: Sparkles, title: "Gamified Progress", desc: "Earn badges, climb leaderboards, and unlock rewards across the RKDF ecosystem." },
+              { icon: Sparkles, title: "Gamified Progress", desc: "Earn badges, climb leaderboards, and unlock rewards across the FITBLISS ecosystem." },
             ].map((p, i) => (
               <div
                 key={p.title}

@@ -11,7 +11,7 @@ export function Footer() {
                 <span className="font-display text-background font-semibold">RK</span>
               </div>
               <div>
-                <div className="font-display text-2xl text-gradient-gold tracking-wider">RKDF</div>
+                <div className="font-display text-2xl text-gradient-gold tracking-wider">FITBLISS</div>
                 <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Luxe Fitness Ecosystem</div>
               </div>
             </div>
@@ -35,7 +35,7 @@ export function Footer() {
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li>Bandra West, Mumbai</li>
               <li>+91 98765 43210</li>
-              <li>concierge@rkdf.fit</li>
+              <li>concierge@fitbliss.fit</li>
               <li>Open 24 / 7</li>
             </ul>
           </div>
@@ -43,7 +43,7 @@ export function Footer() {
 
         <div className="pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            © {new Date().getFullYear()} RKDF Gym — All rights reserved
+            © {new Date().getFullYear()} FITBLISS Gym — All rights reserved
           </p>
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
             Crafted with intelligence

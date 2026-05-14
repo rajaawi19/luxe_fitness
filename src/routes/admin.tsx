@@ -43,8 +43,8 @@ import {
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Admin Console — RKDF Gym" },
-      { name: "description", content: "Internal RKDF admin console for managing members, memberships, and operations." },
+      { title: "Admin Console — FITBLISS Gym" },
+      { name: "description", content: "Internal FITBLISS admin console for managing members, memberships, and operations." },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
@@ -172,7 +172,7 @@ function AdminPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `rkdf-invoices-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `fitbliss-invoices-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -348,7 +348,7 @@ function AdminPage() {
         <div className="flex items-center justify-between flex-wrap gap-4 mb-12">
           <div>
             <span className="text-xs uppercase tracking-[0.4em] text-gradient-gold">Admin Console</span>
-            <h1 className="font-display text-4xl md:text-5xl mt-3">RKDF Operations</h1>
+            <h1 className="font-display text-4xl md:text-5xl mt-3">FITBLISS Operations</h1>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={reloadAll} className="flex items-center gap-2 px-4 py-2 rounded-full glass text-xs uppercase tracking-[0.2em] hover:bg-accent/40 transition">

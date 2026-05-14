@@ -38,7 +38,7 @@ export function Navbar() {
             <span className="font-display text-background font-semibold text-sm tracking-tight">RK</span>
           </div>
           <div className="leading-tight">
-            <div className="font-display text-xl tracking-wider text-gradient-gold">RKDF</div>
+            <div className="font-display text-xl tracking-wider text-gradient-gold">FITBLISS</div>
             <div className="text-[9px] uppercase tracking-[0.3em] text-muted-foreground">Luxe Fitness</div>
           </div>
         </Link>

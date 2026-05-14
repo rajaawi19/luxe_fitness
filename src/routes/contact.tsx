@@ -5,22 +5,22 @@ import { canonical, organizationJsonLd, webpageJsonLd, jsonLdScript } from "@/li
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact — Visit the RKDF Sanctuary in Mumbai" },
-      { name: "description", content: "Visit RKDF in Mumbai or reach our concierge team for tours, private consultations, and membership inquiries — we respond within an hour." },
-      { property: "og:title", content: "Contact — Visit the RKDF Sanctuary in Mumbai" },
+      { title: "Contact — Visit the FITBLISS Sanctuary in Mumbai" },
+      { name: "description", content: "Visit FITBLISS in Mumbai or reach our concierge team for tours, private consultations, and membership inquiries — we respond within an hour." },
+      { property: "og:title", content: "Contact — Visit the FITBLISS Sanctuary in Mumbai" },
       { property: "og:description", content: "Tour the sanctuary, book a private consultation, or speak with our concierge." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: canonical("/contact") },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Contact — Visit the RKDF Sanctuary in Mumbai" },
+      { name: "twitter:title", content: "Contact — Visit the FITBLISS Sanctuary in Mumbai" },
       { name: "twitter:description", content: "Tour the sanctuary, book a private consultation, or speak with our concierge." },
     ],
     links: [{ rel: "canonical", href: canonical("/contact") }],
     scripts: [
       jsonLdScript(organizationJsonLd()),
       jsonLdScript(webpageJsonLd({
-        name: "Contact — Visit the RKDF Sanctuary in Mumbai",
-        description: "Visit RKDF in Mumbai or reach our concierge team for tours, private consultations, and membership inquiries.",
+        name: "Contact — Visit the FITBLISS Sanctuary in Mumbai",
+        description: "Visit FITBLISS in Mumbai or reach our concierge team for tours, private consultations, and membership inquiries.",
         path: "/contact",
       })),
     ],
@@ -47,7 +47,7 @@ function ContactPage() {
             {[
               { icon: MapPin, label: "Sanctuary", value: "Linking Road, Bandra West, Mumbai 400050" },
               { icon: Phone, label: "Direct", value: "+91 98765 43210" },
-              { icon: Mail, label: "Concierge", value: "concierge@rkdf.fit" },
+              { icon: Mail, label: "Concierge", value: "concierge@fitbliss.fit" },
               { icon: Clock, label: "Hours", value: "Open 24 / 7 — every day of the year" },
             ].map((c) => (
               <div key={c.label} className="p-6 rounded-2xl glass flex items-start gap-5">
