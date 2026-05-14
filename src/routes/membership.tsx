@@ -85,6 +85,7 @@ const plans: Array<{
 function MembershipPage() {
   const navigate = useNavigate();
   const [loadingPlan, setLoadingPlan] = useState<PlanName | null>(null);
+  const createRequest = useServerFn(createPaymentRequest);
 
   useEffect(() => {
     trackEvent("membership_page_viewed");
@@ -97,18 +98,14 @@ function MembershipPage() {
     try {
       const { data: sess } = await supabase.auth.getSession();
       if (!sess.session) {
-        toast.info("Please sign in to continue to checkout");
+        toast.info("Please sign in to continue");
         navigate({ to: "/auth" });
         return;
       }
-      const { url } = await createCheckoutSession({
-        data: { plan, origin: window.location.origin },
-        headers: { Authorization: `Bearer ${sess.session.access_token}` },
-      } as any);
-      if (!url) throw new Error("No checkout URL returned");
-      window.location.href = url;
+      const req = await createRequest({ data: { plan } });
+      navigate({ to: "/pay/$requestId", params: { requestId: req.id } });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Checkout failed";
+      const msg = err instanceof Error ? err.message : "Failed to start payment";
       toast.error(msg);
       setLoadingPlan(null);
     }
